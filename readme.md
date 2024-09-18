@@ -1,13 +1,22 @@
 # NEAR Watch
 
-NEAR Watch is a powerful tool for building and fast launching custom indexers on the NEAR blockchain. 
-It provides an easy-to-use interface for tracking blockchain events and querying data through APIs.
+NEAR Watch is a powerful tool for building and fast launching custom indexers on the NEAR blockchain using substreams. 
+It provides an easy-to-use interface for tracking blockchain events, filter and store in database, querying data through prebuild and extendable API.
+
+Compare with existing NEAR indexer/API solutions:
+- BigQuery - expensive to read big amount of data.
+- QueryAPI - not stable.
+- Lake Framework - complicated setup, AWS usage.
+- Pikespeak - great solution, but not open-source and not extendable for your needs.
+
+What we have: fast and easy setup, stable and real-time data that hosts in your own database. 
+It mean that you can read/process any amount of data and get real-time updates combined with pre-defined API.
 
 Features:
 - Fast setup for custom NEAR indexers
 - Real-time event tracking and API support
 - Scalable and flexible architecture
-- Get all historical data for NEAR blockchain, no need to run archival node
+- Get all historical data for NEAR blockchain, no need to run node
 - Small size of data storage - optimised for most-important data only
 - NEAR Social support - parse all social.near events for better search and filter
 - Clickhouse and Postgresql support
