@@ -1,6 +1,4 @@
 node_modules/
-build/
-/substreams/target/
 
 package-lock.json
 yarn.lock

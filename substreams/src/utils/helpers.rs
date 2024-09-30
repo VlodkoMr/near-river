@@ -23,7 +23,7 @@ pub fn extract_function_call_args(args: &Vec<u8>) -> String {
         Err(_) => "".to_string(),
     };
 
-    if args_str.len() > MAX_ARGS_LENGTH {
+    if args_str.len() > *MAX_ARGS_LENGTH {
         return "".to_string();
     }
 

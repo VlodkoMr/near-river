@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use substreams_near::pb::sf::near::r#type::v1::{Action, ExecutionOutcome, Receipt, SignedTransaction};
 use crate::pb::near::custom::v1::{TransactionMeta, BlockMeta, ReceiptActionMeta};
 use substreams_near::pb::sf::near::r#type::v1::action::Action as ActionTypes;
-use crate::config::TERAGAS_FACTOR;
 use crate::utils::block_timestamp::BlockTimestamp;
 use crate::utils::helpers::{bs58_hash_to_string, bytes_to_near_amount, extract_function_call_args, extract_social_kind};
 
@@ -41,7 +40,7 @@ pub fn transform_action(action: &Action, block: &BlockMeta, receipt: &Receipt, a
 
     let gas: u32 = match &action.action {
         Some(ActionTypes::FunctionCall(function_call)) => {
-            function_call.gas.checked_div(TERAGAS_FACTOR).unwrap_or(0) as u32
+            function_call.gas.checked_div(1_000_000_000_000).unwrap_or(0) as u32
         },
         _ => 0,
     };

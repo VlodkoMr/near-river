@@ -11,10 +11,18 @@ use substreams_near::pb::sf::near::r#type::v1::receipt::Receipt as ReceiptTypes;
 use crate::utils::block_timestamp::BlockTimestamp;
 use crate::utils::helpers::bs58_hash_to_string;
 use crate::utils::transform::{transform_action, transform_transaction};
-use crate::config::{FILTERED_RECEIVER_IDS, FILTERED_METHOD_NAMES};
+use crate::config::{FILTERED_RECEIVER_IDS, FILTERED_METHOD_NAMES, END_BLOCK};
 
 #[substreams::handlers::map]
 fn store_transactions(blk: Block) -> BlockDataOutput {
+    // Check if we reached the end block
+    if let Some(end_block) = *END_BLOCK {
+        let block_height = blk.header.as_ref().map_or(0, |h| h.height);
+        if block_height > end_block {
+            panic!("Reached END_BLOCK: {}. Stopping block processing.", end_block);
+        }
+    }
+
     // Extract block metadata if available
     let (transactions, receipt_actions, block_meta) = blk.header.as_ref().map_or(
         (Vec::new(), Vec::new(), None),
@@ -121,13 +129,13 @@ fn process_receipt_actions(
 
 // Check if a transaction should be processed
 fn should_process_transaction(transaction: &SignedTransaction) -> bool {
-    FILTERED_RECEIVER_IDS.is_empty() || FILTERED_RECEIVER_IDS.contains(&transaction.receiver_id.as_str())
+    FILTERED_RECEIVER_IDS.is_empty() || FILTERED_RECEIVER_IDS.contains(&transaction.receiver_id.to_string())
 }
 
 // Check if an action should be processed
 fn should_process_action(action: &ReceiptActionMeta) -> bool {
-    (FILTERED_RECEIVER_IDS.is_empty() || FILTERED_RECEIVER_IDS.contains(&action.receiver_id.as_str()))
-        && (FILTERED_METHOD_NAMES.is_empty() || FILTERED_METHOD_NAMES.contains(&action.method_name.as_str()))
+    (FILTERED_RECEIVER_IDS.is_empty() || FILTERED_RECEIVER_IDS.contains(&action.receiver_id.to_string()))
+        && (FILTERED_METHOD_NAMES.is_empty() || FILTERED_METHOD_NAMES.contains(&action.method_name.to_string()))
 }
 
 // Database updates

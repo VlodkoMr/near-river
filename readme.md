@@ -3,6 +3,8 @@
 NEAR Watch is a powerful tool for building and fast launching custom indexers on the NEAR blockchain using substreams. 
 It provides an easy-to-use interface for tracking blockchain events, filter and store in database, querying data through prebuild and extendable API.
 
+Collect / Query / Analyze / Execute
+
 Compare with existing NEAR indexer/API solutions:
 - BigQuery - expensive to read big amount of data.
 - QueryAPI - not stable.
@@ -51,3 +53,24 @@ npm run substreams:rorate_token:local
 ```bash
 npm run substreams:start:local
 ```
+
+-----------
+
+Start:
+```bash
+docker-compose build
+#docker-compose up -d db
+#docker-compose run substreams bash -c './scripts/init_substreams.sh'
+docker-compose up
+```
+Stop and cleanup:
+```bash
+docker-compose down --remove-orphans
+```
+
+
+
+-----------
+
+TODO:
+- Filter addresses masks to extend filter posibilities.
