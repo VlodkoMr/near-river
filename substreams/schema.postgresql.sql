@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS blocks;
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS receipt_actions;
+
 CREATE TABLE blocks (
       block_height BIGINT UNIQUE NOT NULL,
       block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -26,10 +30,9 @@ CREATE INDEX idx_transactions_signer_id ON transactions(signer_id);
 CREATE INDEX idx_transactions_receiver_id ON transactions(receiver_id);
 
 CREATE TABLE receipt_actions (
-      id TEXT UNIQUE NOT NULL,
+      receipt_id TEXT NOT NULL,
       block_height BIGINT NOT NULL,
       block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-      receipt_id TEXT,
       predecessor_id VARCHAR(64) NOT NULL,
       receiver_id VARCHAR(64) NOT NULL,
       action_kind VARCHAR(20) NOT NULL,
@@ -41,10 +44,11 @@ CREATE TABLE receipt_actions (
       deposit DOUBLE PRECISION NOT NULL,
       stake DOUBLE PRECISION NOT NULL,
       status VARCHAR(20) NOT NULL,
-      PRIMARY KEY (id),
+      PRIMARY KEY (receipt_id),
       FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_receipt_actions_block_timestamp ON receipt_actions(block_timestamp);
 CREATE INDEX idx_receipt_actions_predecessor_id ON receipt_actions(predecessor_id);
 CREATE INDEX idx_receipt_actions_receiver_id ON receipt_actions(receiver_id);
+CREATE INDEX idx_receipt_actions_method_name ON receipt_actions(method_name);

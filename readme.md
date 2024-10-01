@@ -59,8 +59,6 @@ npm run substreams:start:local
 Start:
 ```bash
 docker-compose build
-#docker-compose up -d db
-#docker-compose run substreams bash -c './scripts/init_substreams.sh'
 docker-compose up
 ```
 Stop and cleanup:
@@ -68,6 +66,11 @@ Stop and cleanup:
 docker-compose down --remove-orphans
 ```
 
+Reset database:
+```bash
+rm ./substreams/substreams_init.lock
+docker-compose up
+```
 
 
 -----------

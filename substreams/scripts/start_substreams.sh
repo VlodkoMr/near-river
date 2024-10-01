@@ -5,6 +5,11 @@ set -a
 source ".env"
 set +a
 
+make protogen
+
+echo "Building Rust project targeting WASM..."
+cargo build --release --target wasm32-unknown-unknown || { echo "Rust build failed"; exit 1; }
+
 INIT_LOCK_FILE="./substreams_init.lock"
 
 if [[ ! -f "$INIT_LOCK_FILE" ]]; then
@@ -30,22 +35,20 @@ if [[ ! -f "$INIT_LOCK_FILE" ]]; then
     fi
   fi
 
-  echo "START_BLOCK = $START_BLOCK"
-
-  # Update the initialBlock value in the clickhouse YAML file
+  # Update the initialBlock value in the ClickHouse YAML file
   sed -i "s/initialBlock: .*/initialBlock: $START_BLOCK/" ./substreams.clickhouse.yaml
-  echo "Updated initialBlock to $START_BLOCK in substreams.clickhouse.yaml"
+  echo "Update initialBlock in substreams.clickhouse.yaml to $START_BLOCK"
 
-  # Update the initialBlock value in the postgresql YAML file
+  # Update the initialBlock value in the PostgreSQL YAML file
   sed -i "s/initialBlock: .*/initialBlock: $START_BLOCK/" ./substreams.postgresql.yaml
-  echo "Updated initialBlock to $START_BLOCK in substreams.postgresql.yaml"
+  echo "Update initialBlock in substreams.postgresql.yaml to $START_BLOCK"
 
   # Strip carriage returns from DB_CONNECTION (useful in case the .env file has Windows-style line endings)
   DB_CONNECTION="${DB_CONNECTION//$'\r'/}"
 
   # Set up the substreams-sink-sql
-  sleep 10
-  substreams-sink-sql setup "$DB_CONNECTION" ./substreams.clickhouse.yaml
+  substreams-sink-sql setup "$DB_CONNECTION" ./substreams.clickhouse.yaml || { echo "substreams-sink-sql setup failed"; exit 1; }
+  sleep 1
 
   # Create the lock file to indicate initialization is complete
   touch "$INIT_LOCK_FILE"

@@ -17,19 +17,14 @@ RUN curl -sSL "https://github.com/bufbuild/buf/releases/download/v1.19.0/buf-Lin
 RUN curl -L https://github.com/streamingfast/substreams/releases/download/v1.10.4/substreams_linux_x86_64.tar.gz | tar -xz -C /usr/local/bin
 RUN curl -L https://github.com/streamingfast/substreams-sink-sql/releases/download/v4.2.1/substreams-sink-sql_linux_x86_64.tar.gz | tar -xz -C /usr/local/bin
 
+RUN rustup target add wasm32-unknown-unknown
+
 # Set the working directory
 WORKDIR /app
 
 # Copy the project files into the container
 COPY . .
 
-# Make necessary scripts executable
 RUN chmod +x ./scripts/start_substreams.sh
-RUN chmod +x ./scripts/init_substreams.sh
 
-# Run make protogen to generate protobuf files
-RUN make protogen
-
-# Build the Rust project targeting WASM
-RUN cargo build --release --target wasm32-unknown-unknown
-
+CMD ["sh", "-c", "./scripts/start_substreams.sh"]

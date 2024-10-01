@@ -1,23 +1,8 @@
 use std::env;
 use once_cell::sync::Lazy;
 
-// Load environment variables (only in non-WASM environments)
-#[cfg(not(target_family = "wasm"))]
-fn load_env() {
-    dotenv::dotenv().ok();
-}
-
-#[cfg(target_family = "wasm")]
-fn load_env() {
-    // No-op for WASM environments
-}
-
-// A single initialization point for environment loading
-static INIT_ENV: Lazy<()> = Lazy::new(|| load_env());
-
 // Helper function to get environment variables with a default
 fn get_env_var(key: &str, default: &str) -> String {
-    Lazy::force(&INIT_ENV); // Ensure environment is initialized
     env::var(key).unwrap_or_else(|_| default.to_string())
 }
 
@@ -31,7 +16,7 @@ fn get_env_array(key: &str, default: &str) -> Vec<String> {
 }
 
 // Lazy static variables
-pub static FILTERED_RECEIVER_IDS: Lazy<Vec<String>> = Lazy::new(|| get_env_array("FILTERED_RECEIVER_IDS", ""));
+pub static FILTERED_RECEIVER_IDS: Lazy<Vec<String>> = Lazy::new(|| vec!["social.near".to_string(), "game.hot.tg".to_string()]);
 pub static FILTERED_METHOD_NAMES: Lazy<Vec<String>> = Lazy::new(|| get_env_array("FILTERED_METHOD_NAMES", ""));
 
 pub static MAX_ARGS_LENGTH: Lazy<usize> = Lazy::new(|| {
@@ -39,7 +24,7 @@ pub static MAX_ARGS_LENGTH: Lazy<usize> = Lazy::new(|| {
 });
 
 pub static END_BLOCK: Lazy<Option<u64>> = Lazy::new(|| {
-    let end_block = get_env_var("END_BLOCK", "");
+    let end_block = "129187000";
     if end_block.trim().is_empty() {
         None
     } else {

@@ -15,18 +15,17 @@ use crate::config::{FILTERED_RECEIVER_IDS, FILTERED_METHOD_NAMES, END_BLOCK};
 
 #[substreams::handlers::map]
 fn store_transactions(blk: Block) -> BlockDataOutput {
-    // Check if we reached the end block
-    if let Some(end_block) = *END_BLOCK {
-        let block_height = blk.header.as_ref().map_or(0, |h| h.height);
-        if block_height > end_block {
-            panic!("Reached END_BLOCK: {}. Stopping block processing.", end_block);
-        }
-    }
-
     // Extract block metadata if available
     let (transactions, receipt_actions, block_meta) = blk.header.as_ref().map_or(
         (Vec::new(), Vec::new(), None),
         |block_header| {
+            if let Some(end_block) = *END_BLOCK {
+                if block_header.height > end_block {
+                    // Return empty data if the block height exceeds END_BLOCK
+                    return (Vec::new(), Vec::new(), None);
+                }
+            }
+
             let timestamp = BlockTimestamp::from_block(block_header);
             let block_meta = BlockMeta {
                 block_height: block_header.height,
@@ -144,19 +143,21 @@ fn should_process_action(action: &ReceiptActionMeta) -> bool {
 fn db_out(block_data_output: BlockDataOutput) -> Result<DatabaseChanges, substreams::errors::Error> {
     let mut database_changes: DatabaseChanges = Default::default();
 
-    // Save block
-    push_block_create(&mut database_changes, &block_data_output.block.unwrap());
+    if block_data_output.block.is_some() {
+        // Save block
+        push_block_create(&mut database_changes, &block_data_output.block.unwrap());
 
-    // Save transactions
-    // TODO: filter transactions
-    for transaction in block_data_output.transactions {
-        push_transaction_create(&mut database_changes, &transaction, 0);
-    }
+        // Save transactions
+        for transaction in block_data_output.transactions {
+            push_transaction_create(&mut database_changes, &transaction, 0);
+        }
 
-    // Save Actions
-    // TODO: filter actions
-    for action in block_data_output.receipt_actions.iter() {
-        push_action_create(&mut database_changes, &action);
+        // Save Actions
+        for action in block_data_output.receipt_actions.iter() {
+            push_action_create(&mut database_changes, &action);
+        }
+    } else {
+        println!("No block data, skipping");
     }
 
     Ok(database_changes)
@@ -195,7 +196,7 @@ fn push_action_create(
     changes: &mut DatabaseChanges,
     action: &ReceiptActionMeta,
 ) {
-    let pk = format!("{}:{}", action.block_height, action.action_index);
+    let pk = format!("{}:{}:{}", action.block_height, action.action_index, action.receipt_id);
 
     changes
         .push_change("receipt_actions", &pk, action.action_index, Operation::Create)

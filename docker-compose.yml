@@ -2,6 +2,8 @@ services:
   substreams:
     build: ./substreams
     command: ["sh", "-c", "./scripts/start_substreams.sh"]
+    volumes:
+      - ./substreams:/app
     depends_on:
       - db
 
