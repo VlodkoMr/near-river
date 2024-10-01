@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS blocks;
 DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS receipt_actions;
+DROP TABLE IF EXISTS cursors;
 
 CREATE TABLE blocks
 (
@@ -40,6 +41,7 @@ PRIMARY KEY (tx_hash);
 
 CREATE TABLE receipt_actions
 (
+    id String,
     receipt_id String,
     block_height Int64,
     block_timestamp DateTime('UTC'),
@@ -62,5 +64,5 @@ CREATE TABLE receipt_actions
     INDEX idx_receipt_actions_action_kind action_kind TYPE bloom_filter() GRANULARITY 1
 )
     ENGINE = MergeTree()
-ORDER BY (receipt_id, block_height, predecessor_id, receiver_id)
-PRIMARY KEY (receipt_id);
+ORDER BY (id, block_height, predecessor_id, receiver_id)
+PRIMARY KEY (id);

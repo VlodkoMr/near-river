@@ -1,6 +1,8 @@
 use serde_json::Value;
 use std::string::String;
+use xxhash_rust::xxh3::Xxh3;
 use substreams_near::pb::sf::near::r#type::v1::CryptoHash;
+use crate::pb::near::custom::v1::ReceiptActionMeta;
 use crate::config::MAX_ARGS_LENGTH;
 
 pub fn bytes_to_near_amount(bytes: Vec<u8>) -> f64 {
@@ -14,6 +16,13 @@ pub fn bs58_hash_to_string(hash: Option<CryptoHash>) -> String {
         Some(h) => bs58::encode(h.bytes).into_string(),
         None => "".to_string(),
     }
+}
+
+pub fn generate_hash_pk(action: &ReceiptActionMeta) -> u64 {
+    let pk = format!("{}:{}:{}", action.block_height, action.action_index, action.receipt_id);
+    let mut hash = Xxh3::new();
+    hash.update(pk.as_bytes());
+    hash.digest()
 }
 
 // Extracts the function call arguments from the action and limits the length to MAX_ARGS_LENGTH

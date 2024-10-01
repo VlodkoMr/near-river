@@ -24,7 +24,7 @@ pub static MAX_ARGS_LENGTH: Lazy<usize> = Lazy::new(|| {
 });
 
 pub static END_BLOCK: Lazy<Option<u64>> = Lazy::new(|| {
-    let end_block = "129187000";
+    let end_block = "129060000";
     if end_block.trim().is_empty() {
         None
     } else {

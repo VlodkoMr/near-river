@@ -30,9 +30,10 @@ CREATE INDEX idx_transactions_signer_id ON transactions(signer_id);
 CREATE INDEX idx_transactions_receiver_id ON transactions(receiver_id);
 
 CREATE TABLE receipt_actions (
-      receipt_id TEXT NOT NULL,
+      id TEXT UNIQUE NOT NULL,
       block_height BIGINT NOT NULL,
       block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+      receipt_id TEXT NOT NULL,
       predecessor_id VARCHAR(64) NOT NULL,
       receiver_id VARCHAR(64) NOT NULL,
       action_kind VARCHAR(20) NOT NULL,
@@ -44,7 +45,7 @@ CREATE TABLE receipt_actions (
       deposit DOUBLE PRECISION NOT NULL,
       stake DOUBLE PRECISION NOT NULL,
       status VARCHAR(20) NOT NULL,
-      PRIMARY KEY (receipt_id),
+      PRIMARY KEY (id),
       FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE
 );
 

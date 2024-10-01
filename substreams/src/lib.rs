@@ -9,7 +9,7 @@ use substreams_near::pb::sf::near::r#type::v1::execution_outcome::Status;
 use crate::pb::near::custom::v1::{BlockDataOutput, BlockMeta, ReceiptActionMeta, TransactionMeta};
 use substreams_near::pb::sf::near::r#type::v1::receipt::Receipt as ReceiptTypes;
 use crate::utils::block_timestamp::BlockTimestamp;
-use crate::utils::helpers::bs58_hash_to_string;
+use crate::utils::helpers::{bs58_hash_to_string, generate_hash_pk};
 use crate::utils::transform::{transform_action, transform_transaction};
 use crate::config::{FILTERED_RECEIVER_IDS, FILTERED_METHOD_NAMES, END_BLOCK};
 
@@ -196,10 +196,10 @@ fn push_action_create(
     changes: &mut DatabaseChanges,
     action: &ReceiptActionMeta,
 ) {
-    let pk = format!("{}:{}:{}", action.block_height, action.action_index, action.receipt_id);
+    let pk = generate_hash_pk(action);
 
     changes
-        .push_change("receipt_actions", &pk, action.action_index, Operation::Create)
+        .push_change("receipt_actions", &pk.to_string(), action.action_index, Operation::Create)
         .change("block_timestamp", (None, action.block_timestamp))
         .change("block_height", (None, action.block_height))
         .change("receipt_id", (None, &action.receipt_id))
