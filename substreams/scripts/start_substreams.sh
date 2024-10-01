@@ -57,7 +57,19 @@ else
   echo "Initialization has already been completed. Skipping setup."
 fi
 
+# Strip carriage returns from environment variables
+SUBSTREAMS_API_KEY="${SUBSTREAMS_API_KEY//$'\r'/}"
 DB_CONNECTION="${DB_CONNECTION//$'\r'/}"
+START_BLOCK="${START_BLOCK//$'\r'/}"
+END_BLOCK="${END_BLOCK//$'\r'/}"
 
-substreams-sink-sql run "$DB_CONNECTION" ./substreams.clickhouse.yaml \
---header "x-api-key:$SUBSTREAMS_API_KEY" --undo-buffer-size 50000 --on-module-hash-mistmatch warn
+if [ -z "$END_BLOCK" ]; then
+  BLOCK_RANGE="$START_BLOCK"
+else
+  BLOCK_RANGE="$START_BLOCK":"$END_BLOCK"
+fi
+
+substreams-sink-sql run "$DB_CONNECTION" ./substreams.clickhouse.yaml "$BLOCK_RANGE" \
+  --header "x-api-key:$SUBSTREAMS_API_KEY" \
+  --undo-buffer-size 50000 \
+  --on-module-hash-mistmatch warn

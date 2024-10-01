@@ -11,7 +11,7 @@ use substreams_near::pb::sf::near::r#type::v1::receipt::Receipt as ReceiptTypes;
 use crate::utils::block_timestamp::BlockTimestamp;
 use crate::utils::helpers::{bs58_hash_to_string, generate_hash_pk};
 use crate::utils::transform::{transform_action, transform_transaction};
-use crate::config::{FILTERED_RECEIVER_IDS, FILTERED_METHOD_NAMES, END_BLOCK};
+use crate::config::{FILTERED_RECEIVER_IDS, FILTERED_METHOD_NAMES};
 
 #[substreams::handlers::map]
 fn store_transactions(blk: Block) -> BlockDataOutput {
@@ -19,13 +19,6 @@ fn store_transactions(blk: Block) -> BlockDataOutput {
     let (transactions, receipt_actions, block_meta) = blk.header.as_ref().map_or(
         (Vec::new(), Vec::new(), None),
         |block_header| {
-            if let Some(end_block) = *END_BLOCK {
-                if block_header.height > end_block {
-                    // Return empty data if the block height exceeds END_BLOCK
-                    return (Vec::new(), Vec::new(), None);
-                }
-            }
-
             let timestamp = BlockTimestamp::from_block(block_header);
             let block_meta = BlockMeta {
                 block_height: block_header.height,
