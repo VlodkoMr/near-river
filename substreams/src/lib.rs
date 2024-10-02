@@ -1,6 +1,6 @@
 mod pb;
 mod utils;
-pub mod config;
+mod env;
 
 use std::collections::HashMap;
 use substreams_near::pb::sf::near::r#type::v1::{Block, BlockHeader, IndexerChunk, IndexerShard, SignedTransaction};
@@ -11,7 +11,7 @@ use substreams_near::pb::sf::near::r#type::v1::receipt::Receipt as ReceiptTypes;
 use crate::utils::block_timestamp::BlockTimestamp;
 use crate::utils::helpers::{bs58_hash_to_string, generate_hash_pk};
 use crate::utils::transform::{transform_action, transform_transaction};
-use crate::config::{FILTERED_RECEIVER_IDS, FILTERED_METHOD_NAMES};
+use crate::env::{FILTERED_RECEIVER_IDS, FILTERED_METHOD_NAMES};
 
 #[substreams::handlers::map]
 fn store_transactions(blk: Block) -> BlockDataOutput {
@@ -121,13 +121,13 @@ fn process_receipt_actions(
 
 // Check if a transaction should be processed
 fn should_process_transaction(transaction: &SignedTransaction) -> bool {
-    FILTERED_RECEIVER_IDS.is_empty() || FILTERED_RECEIVER_IDS.contains(&transaction.receiver_id.to_string())
+    FILTERED_RECEIVER_IDS.is_empty() || FILTERED_RECEIVER_IDS.contains(&transaction.receiver_id.as_str())
 }
 
 // Check if an action should be processed
 fn should_process_action(action: &ReceiptActionMeta) -> bool {
-    (FILTERED_RECEIVER_IDS.is_empty() || FILTERED_RECEIVER_IDS.contains(&action.receiver_id.to_string()))
-        && (FILTERED_METHOD_NAMES.is_empty() || FILTERED_METHOD_NAMES.contains(&action.method_name.to_string()))
+    (FILTERED_RECEIVER_IDS.is_empty() || FILTERED_RECEIVER_IDS.contains(&action.receiver_id.as_str()))
+        && (FILTERED_METHOD_NAMES.is_empty() || FILTERED_METHOD_NAMES.contains(&action.method_name.as_str()))
 }
 
 // Database updates

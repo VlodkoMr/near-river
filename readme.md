@@ -1,79 +1,86 @@
 # NEAR Watch
 
-NEAR Watch is a powerful tool for building and fast launching custom indexers on the NEAR blockchain using substreams. 
-It provides an easy-to-use interface for tracking blockchain events, filter and store in database, querying data through prebuild and extendable API.
+NEAR Watch is a powerful tool for building and quickly launching custom indexers on the NEAR blockchain using Substreams. 
+It provides an easy-to-use interface for tracking blockchain events, filtering and storing them in a database, 
+and querying data through a pre-built, extendable API.
 
-Collect / Query / Analyze / Execute
+### Why Choose NEAR Watch?
 
-Compare with existing NEAR indexer/API solutions:
-- BigQuery - expensive to read big amount of data.
-- QueryAPI - not stable.
-- Lake Framework - complicated setup, AWS usage.
-- Pikespeak - great solution, but not open-source and not extendable for your needs.
+NEAR Watch is easy to set up, letting you run an indexer in just 5 minutes with real-time, stable data flow to your database. 
+It’s scalable, flexible, and designed to handle any amount of data with real-time updates. 
+The pre-built API makes querying easy, and data storage is optimized for key data points.
 
-What we have: fast and easy setup, stable and real-time data that hosts in your own database. 
-It mean that you can read/process any amount of data and get real-time updates combined with pre-defined API.
+AI help you to get powerful data analytics and insights.
 
-Features:
-- Fast setup for custom NEAR indexers
-- Real-time event tracking and API support
-- Scalable and flexible architecture
-- Get all historical data for NEAR blockchain, no need to run node
-- Small size of data storage - optimised for most-important data only
-- NEAR Social support - parse all social.near events for better search and filter
-- Clickhouse and Postgresql support
+### Key Features:
+
+- Rapid setup for custom NEAR indexer: edit `.env` file and run docker!
+- Pre-build API with endpoints customisation: get transactions, receipts, blocks, and general KPI data.
+- Scalable and flexible design: you can extend indexer and API with your custom logic, project is open-source.
+- Access to all historical NEAR blockchain data without the need to run a node.
+- Optimized data storage for reduced size. All NEAR blockchain data can be stored in 500Gb drive!
+- NEAR Social support - parse all `social.near` events for better search and filtering.
+- ClickHouse and PostgreSQL database types support.
+
+### Comparison with Existing NEAR Indexer/API Solutions:
+
+- **BigQuery** - Expensive when reading large amounts of data.
+- **QueryAPI** - Unstable (under beta testing), no control on indexing (no way to stop or restart indexer).
+- **Lake Framework** - Complex setup, relies on AWS. Require archival node to get historical data.
+- **Pikespeak API** - A great solution, but not open-source or extendable for custom needs, paid solution.
+
 
 ## Requirements
 
-- Rust 1.72+
-- [substreams 1.10.4+](https://github.com/streamingfast/substreams/releases)
-- [substreams-sink-sql 4.2.1+](https://github.com/streamingfast/substreams-sink-sql/releases)
-- [Clickhouse](https://clickhouse.com/docs/en/install) or PostgreSQL database
+- Docker
 
-## Install
+## Installation
 
-Get your SUBSTREAMS_API_KEY from https://app.streamingfast.io/keys
 
-1. Clone repo
-2. Copy `.env.example` to `.env` and update with your configurations:
-```bash
-cp .env.example .env
-```
+1. Get your `SUBSTREAMS_API_KEY` from https://app.streamingfast.io/keys.
 
-3. Build:
-```bash
-npm run substreams:build
-npm run substreams:init:local
-```
-4. Update your API TOKEN:
-```bash
-npm run substreams:rorate_token:local
-```
-5. Start listener:
-```bash
-npm run substreams:start:local
-```
+2. Clone the repository:
 
------------
+    ```bash
+    git clone ...
+    ```
+3. Copy `.env.example` to `.env` and update it with your configurations:
 
-Start:
+    ```bash
+    cp substreams/.env.example substreams/.env
+    ```
+   
+### Environment Variables
+- `SUBSTREAMS_API_KEY` - Your Substreams API key.
+- `DB_CONNECTION` - Database connection string: postgresql or clickhouse.
+- `START_BLOCK` - The starting block for the indexer. Use "latest" to start from the latest block at launch.
+- `END_BLOCK` - The ending block for the indexer. Leave it empty to track all blocks, or set a block number to stop processing before that block.
+- `FILTERED_RECEIVER_IDS` - A comma-separated list of transaction receivers (smart-contract that user call or tx recipient) to filter transactions and receipts. Empty string to process all transactions.
+- `FILTERED_METHOD_NAMES` - A comma-separated list of method names to filter receipts. Empty string to process all receipts.
+- `MAX_ARGS_LENGTH` - The maximum length of the arguments string to store in the database. This helps save disk space by limiting the argument string length.
+
+
+## Running the Project
+
+#### Start the Application:
+
 ```bash
 docker-compose build
 docker-compose up
 ```
-Stop and cleanup:
+
+#### Stop and Clean Up:
+
 ```bash
 docker-compose down --remove-orphans
 ```
 
-Reset database:
+#### Reset the Database:
+
 ```bash
 rm ./substreams/substreams_init.lock
 docker-compose up
 ```
 
-
------------
-
-TODO:
-- Filter addresses masks to extend filter posibilities.
+## TODO
+- Add address mask filters to extend filtering capabilities.

@@ -23,7 +23,7 @@ binaries:
 modules:
   - name: store_transactions
     kind: map
-    initialBlock: 129000000
+    initialBlock: 129384870
     inputs:
       - source: sf.near.type.v1.Block
     output:

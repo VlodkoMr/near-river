@@ -3,7 +3,7 @@ use std::string::String;
 use xxhash_rust::xxh3::Xxh3;
 use substreams_near::pb::sf::near::r#type::v1::CryptoHash;
 use crate::pb::near::custom::v1::ReceiptActionMeta;
-use crate::config::MAX_ARGS_LENGTH;
+use crate::env::MAX_ARGS_LENGTH;
 
 pub fn bytes_to_near_amount(bytes: Vec<u8>) -> f64 {
     let bytes_array: [u8; 16] = bytes.try_into().expect("slice with incorrect length");
@@ -32,7 +32,7 @@ pub fn extract_function_call_args(args: &Vec<u8>) -> String {
         Err(_) => "".to_string(),
     };
 
-    if args_str.len() > *MAX_ARGS_LENGTH {
+    if args_str.len() > MAX_ARGS_LENGTH {
         return "".to_string();
     }
 

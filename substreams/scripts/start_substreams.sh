@@ -1,75 +1,65 @@
 #!/bin/bash
 
 # Load environment variables from the specified file
-set -a
-source ".env"
-set +a
+set -a; source ".env"; set +a
 
-make protogen
+# Remove carriage returns from environment variables (for Windows line endings)
+for var in DB_CONNECTION SUBSTREAMS_API_KEY START_BLOCK END_BLOCK MAX_ARGS_LENGTH FILTERED_RECEIVER_IDS FILTERED_METHOD_NAMES; do
+  eval "$var=\"\${$var//$'\r'/}\""
+done
 
+# Function to fetch the latest block number from the NEAR blockchain
+get_latest_block() {
+  curl -s https://rpc.mainnet.near.org \
+    -d '{"jsonrpc":"2.0","id":"dontcare","method":"block","params":{"finality":"final"}}' \
+    -H "Content-Type: application/json" | jq -r '.result.header.height'
+}
+
+# Set START_BLOCK to the latest block if required
+if [[ "$START_BLOCK" == "latest" ]]; then
+  START_BLOCK=$(get_latest_block)
+  [[ -z "$START_BLOCK" ]] && { echo "Failed to fetch the latest block."; exit 1; }
+  echo "Fetched latest block number: $START_BLOCK"
+fi
+
+# Generate Rust environment constants
+cat > ./src/env.rs <<EOL
+pub const MAX_ARGS_LENGTH: usize = ${MAX_ARGS_LENGTH};
+pub const FILTERED_RECEIVER_IDS: &[&str] = &[$(echo "\"${FILTERED_RECEIVER_IDS//,/\", \"}\"")];
+pub const FILTERED_METHOD_NAMES: &[&str] = &[$(echo "\"${FILTERED_METHOD_NAMES//,/\", \"}\"")];
+EOL
+
+# Build Rust project targeting WASM
 echo "Building Rust project targeting WASM..."
 cargo build --release --target wasm32-unknown-unknown || { echo "Rust build failed"; exit 1; }
 
+# Initialization lock file
 INIT_LOCK_FILE="./substreams_init.lock"
 
+# Perform initialization if not already done
 if [[ ! -f "$INIT_LOCK_FILE" ]]; then
   echo "Starting substreams-sink-sql setup..."
+  for yaml_file in ./substreams.clickhouse.yaml ./substreams.postgresql.yaml; do
+    sed -i "s/initialBlock: .*/initialBlock: $START_BLOCK/" "$yaml_file"
+  done
+  echo "Updated initialBlock to $START_BLOCK in YAML files."
 
-  # Function to fetch the latest block number from the NEAR blockchain
-  get_latest_block() {
-    # Fetch latest block using NEAR RPC API
-    near_latest_block=$(curl -s https://rpc.mainnet.near.org -d '{"jsonrpc":"2.0","id":"dontcare","method":"block","params":{"finality":"final"}}' -H "Content-Type: application/json" | jq -r '.result.header.height')
-    echo "$near_latest_block"
-  }
-
-  # If START_BLOCK is set to "latest", fetch the latest block from NEAR blockchain
-  if [[ "$START_BLOCK" == "latest" ]]; then
-    latest_block=$(get_latest_block)
-
-    if [[ -n "$latest_block" ]]; then
-      echo "Fetched latest block number: $latest_block"
-      START_BLOCK=$latest_block
-    else
-      echo "Failed to fetch the latest block number."
-      exit 1
-    fi
-  fi
-
-  # Update the initialBlock value in the ClickHouse YAML file
-  sed -i "s/initialBlock: .*/initialBlock: $START_BLOCK/" ./substreams.clickhouse.yaml
-  echo "Update initialBlock in substreams.clickhouse.yaml to $START_BLOCK"
-
-  # Update the initialBlock value in the PostgreSQL YAML file
-  sed -i "s/initialBlock: .*/initialBlock: $START_BLOCK/" ./substreams.postgresql.yaml
-  echo "Update initialBlock in substreams.postgresql.yaml to $START_BLOCK"
-
-  # Strip carriage returns from DB_CONNECTION (useful in case the .env file has Windows-style line endings)
-  DB_CONNECTION="${DB_CONNECTION//$'\r'/}"
-
-  # Set up the substreams-sink-sql
   substreams-sink-sql setup "$DB_CONNECTION" ./substreams.clickhouse.yaml || { echo "substreams-sink-sql setup failed"; exit 1; }
   sleep 1
 
-  # Create the lock file to indicate initialization is complete
   touch "$INIT_LOCK_FILE"
-  echo "Initialization completed. Lock file created at $INIT_LOCK_FILE"
+  echo "Initialization completed. Lock file created at $INIT_LOCK_FILE."
 else
-  echo "Initialization has already been completed. Skipping setup."
+  echo "Initialization already completed. Skipping setup."
 fi
 
-# Strip carriage returns from environment variables
-SUBSTREAMS_API_KEY="${SUBSTREAMS_API_KEY//$'\r'/}"
-DB_CONNECTION="${DB_CONNECTION//$'\r'/}"
-START_BLOCK="${START_BLOCK//$'\r'/}"
-END_BLOCK="${END_BLOCK//$'\r'/}"
+# Define block range and finals-only flag
+BLOCK_RANGE="${END_BLOCK:+$START_BLOCK:$END_BLOCK}"
+FINALS_ONLY="${START_BLOCK:+--final-blocks-only}"
 
-if [ -z "$END_BLOCK" ]; then
-  BLOCK_RANGE="$START_BLOCK"
-else
-  BLOCK_RANGE="$START_BLOCK":"$END_BLOCK"
-fi
-
+# Run substreams-sink-sql with the provided options
 substreams-sink-sql run "$DB_CONNECTION" ./substreams.clickhouse.yaml "$BLOCK_RANGE" \
   --header "x-api-key:$SUBSTREAMS_API_KEY" \
   --undo-buffer-size 50000 \
-  --on-module-hash-mistmatch warn
+  --on-module-hash-mistmatch warn \
+  $FINALS_ONLY
