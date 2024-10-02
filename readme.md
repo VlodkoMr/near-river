@@ -42,7 +42,7 @@ AI help you to get powerful data analytics and insights.
 2. Clone the repository:
 
     ```bash
-    git clone ...
+    git clone https://github.com/VlodkoMr/near-watch.git
     ```
 3. Copy `.env.example` to `.env` and update it with your configurations:
 
