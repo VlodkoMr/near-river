@@ -1,4 +1,16 @@
 services:
+  api:
+    build: ./api
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000"]
+    volumes:
+      - ./api:/app
+    environment:
+      - PYTHONPATH=/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
   substreams:
     build: ./substreams
     command: ["sh", "-c", "./scripts/start_substreams.sh"]
@@ -8,16 +20,28 @@ services:
       - db
 
   db:
-    image: clickhouse/clickhouse-server:latest
+    image: postgres:17-alpine
+    restart: unless-stopped
     environment:
-      - CLICKHOUSE_USER=default
-      - CLICKHOUSE_PASSWORD=
-      - CLICKHOUSE_DB=near_watch
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=near_watch
     volumes:
-      - db_data:/var/lib/clickhouse
+      - db_data:/var/lib/postgresql/data/
     ports:
-      - "8123:8123"
-      - "9000:9000"
+      - "5432:5432"
+
+#  db:
+#    image: clickhouse/clickhouse-server:latest
+#    environment:
+#      - CLICKHOUSE_USER=default
+#      - CLICKHOUSE_PASSWORD=
+#      - CLICKHOUSE_DB=near_watch
+#    volumes:
+#      - db_data:/var/lib/clickhouse
+#    ports:
+#      - "8123:8123"
+#      - "9000:9000"
 
 volumes:
   db_data:

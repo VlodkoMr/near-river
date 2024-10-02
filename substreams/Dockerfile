@@ -19,10 +19,7 @@ RUN curl -L https://github.com/streamingfast/substreams-sink-sql/releases/downlo
 
 RUN rustup target add wasm32-unknown-unknown
 
-# Set the working directory
 WORKDIR /app
-
-# Copy the project files into the container
 COPY . .
 
 RUN chmod +x ./scripts/start_substreams.sh

@@ -4,14 +4,6 @@ NEAR Watch is a powerful tool for building and quickly launching custom indexers
 It provides an easy-to-use interface for tracking blockchain events, filtering and storing them in a database, 
 and querying data through a pre-built, extendable API.
 
-### Why Choose NEAR Watch?
-
-NEAR Watch is easy to set up, letting you run an indexer in just 5 minutes with real-time, stable data flow to your database. 
-It’s scalable, flexible, and designed to handle any amount of data with real-time updates. 
-The pre-built API makes querying easy, and data storage is optimized for key data points.
-
-AI help you to get powerful data analytics and insights.
-
 ### Key Features:
 
 - Rapid setup for custom NEAR indexer: edit `.env` file and run docker!
@@ -20,7 +12,8 @@ AI help you to get powerful data analytics and insights.
 - Access to all historical NEAR blockchain data without the need to run a node.
 - Optimized data storage for reduced size. All NEAR blockchain data can be stored in 500Gb drive!
 - NEAR Social support - parse all `social.near` events for better search and filtering.
-- ClickHouse and PostgreSQL database types support.
+- AI to get powerful data analytics and insights.
+- PostgreSQL and ClickHouse database support.
 
 ### Comparison with Existing NEAR Indexer/API Solutions:
 
@@ -81,6 +74,14 @@ docker-compose down --remove-orphans
 rm ./substreams/substreams_init.lock
 docker-compose up
 ```
+
+### Why Choose NEAR Watch?
+
+NEAR Watch is easy to set up, letting you run an indexer in just 5 minutes with real-time, stable data flow to your database.
+It’s scalable, flexible, and designed to handle any amount of data with real-time updates.
+The pre-built API makes querying easy, and data storage is optimized for key data points.
+
+AI help you to get powerful data analytics and insights.
 
 ## TODO
 - Add address mask filters to extend filtering capabilities.

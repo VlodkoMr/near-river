@@ -44,8 +44,7 @@ if [[ ! -f "$INIT_LOCK_FILE" ]]; then
   done
   echo "Updated initialBlock to $START_BLOCK in YAML files."
 
-  substreams-sink-sql setup "$DB_CONNECTION" ./substreams.clickhouse.yaml || { echo "substreams-sink-sql setup failed"; exit 1; }
-  sleep 1
+  substreams-sink-sql setup "$DB_CONNECTION" ./substreams.postgresql.yaml || { echo "substreams-sink-sql setup failed"; exit 1; }
 
   touch "$INIT_LOCK_FILE"
   echo "Initialization completed. Lock file created at $INIT_LOCK_FILE."
@@ -58,8 +57,8 @@ BLOCK_RANGE="${END_BLOCK:+$START_BLOCK:$END_BLOCK}"
 FINALS_ONLY="${START_BLOCK:+--final-blocks-only}"
 
 # Run substreams-sink-sql with the provided options
-substreams-sink-sql run "$DB_CONNECTION" ./substreams.clickhouse.yaml "$BLOCK_RANGE" \
+substreams-sink-sql run "$DB_CONNECTION" ./substreams.postgresql.yaml "$BLOCK_RANGE" \
   --header "x-api-key:$SUBSTREAMS_API_KEY" \
   --undo-buffer-size 50000 \
   --on-module-hash-mistmatch warn \
-  $FINALS_ONLY
+  "$FINALS_ONLY"
