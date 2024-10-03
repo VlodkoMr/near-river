@@ -60,6 +60,6 @@ CREATE INDEX idx_receipt_actions_method_name ON receipt_actions(method_name);
 CREATE TABLE api_queries (
        id SERIAL PRIMARY KEY,
        name VARCHAR(255),
-       task_type VARCHAR(20) NOT NULL,  -- 'sql' or 'analytics'
-       task TEXT NOT NULL
+       query_type VARCHAR(20) NOT NULL,  -- 'sql' or 'analytics'
+       query_text TEXT NOT NULL
 );

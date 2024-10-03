@@ -18,5 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 3000
 
+RUN chmod +x ./scripts/start_api.sh
+
 # Run app.py when the container launches
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["sh", "-c", "./scripts/start_api.sh"]

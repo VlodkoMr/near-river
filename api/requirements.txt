@@ -2,7 +2,7 @@ fastapi
 uvicorn
 python-dotenv
 pandas
-psycopg2-binary  # or clickhouse-connect for ClickHouse
-sqlalchemy
 dask
 dask[dataframe]
+tortoise-orm
+asyncpg

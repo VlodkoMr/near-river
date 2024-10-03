@@ -13,7 +13,6 @@ and querying data through a pre-built, extendable API.
 - Optimized data storage for reduced size. All NEAR blockchain data can be stored in 500Gb drive!
 - NEAR Social support - parse all `social.near` events for better search and filtering.
 - AI to get powerful data analytics and insights.
-- PostgreSQL and ClickHouse database support.
 
 ### Comparison with Existing NEAR Indexer/API Solutions:
 
@@ -45,7 +44,7 @@ and querying data through a pre-built, extendable API.
    
 ### Environment Variables
 - `SUBSTREAMS_API_KEY` - Your Substreams API key.
-- `DB_CONNECTION` - Database connection string: postgresql or clickhouse.
+- `DB_CONNECTION` - Database connection string.
 - `START_BLOCK` - The starting block for the indexer. Use "latest" to start from the latest block at launch.
 - `END_BLOCK` - The ending block for the indexer. Leave it empty to track all blocks, or set a block number to stop processing before that block.
 - `FILTERED_RECEIVER_IDS` - A comma-separated list of transaction receivers (smart-contract that user call or tx recipient) to filter transactions and receipts. Empty string to process all transactions.
@@ -74,6 +73,12 @@ docker-compose down --remove-orphans
 rm ./substreams/substreams_init.lock
 docker-compose up
 ```
+
+#### Usage
+
+http://localhost:3000/ - API endpoint
+http://localhost:3000/docs - API documentation
+
 
 ### Why Choose NEAR Watch?
 

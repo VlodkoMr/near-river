@@ -66,3 +66,15 @@ CREATE TABLE receipt_actions
     ENGINE = MergeTree()
 ORDER BY (id, block_height, predecessor_id, receiver_id)
 PRIMARY KEY (id);
+
+
+CREATE TABLE api_queries
+(
+    id String,
+    name String,
+    query_type String,
+    query_text String
+)
+    ENGINE = MergeTree()
+ORDER BY (id)
+PRIMARY KEY (id);
