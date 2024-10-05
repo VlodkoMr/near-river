@@ -6,7 +6,7 @@ and querying data through a pre-built, extendable API.
 
 ### Key Features:
 
-- Rapid setup for custom NEAR indexer: edit `.env` file and run docker!
+- Simplest setup for custom NEAR indexer: just edit `.env` files and run docker!
 - Pre-build API with endpoints customisation: get transactions, receipts, blocks, and general KPI data.
 - Scalable and flexible design: you can extend indexer and API with your custom logic, project is open-source.
 - Access to all historical NEAR blockchain data without the need to run a node.
@@ -40,9 +40,10 @@ and querying data through a pre-built, extendable API.
 
     ```bash
     cp substreams/.env.example substreams/.env
+    cp api/.env.example api/.env
     ```
    
-### Environment Variables
+### Substreams environment (substreams/.env file)
 - `SUBSTREAMS_API_KEY` - Your Substreams API key.
 - `DB_CONNECTION` - Database connection string.
 - `START_BLOCK` - The starting block for the indexer. Use "latest" to start from the latest block at launch.
@@ -50,6 +51,9 @@ and querying data through a pre-built, extendable API.
 - `FILTERED_RECEIVER_IDS` - A comma-separated list of transaction receivers (smart-contract that user call or tx recipient) to filter transactions and receipts. Empty string to process all transactions.
 - `FILTERED_METHOD_NAMES` - A comma-separated list of method names to filter receipts. Empty string to process all receipts.
 - `MAX_ARGS_LENGTH` - The maximum length of the arguments string to store in the database. This helps save disk space by limiting the argument string length.
+
+### API environment (api/.env file)
+- `DB_CONNECTION` - Database connection string.
 
 
 ## Running the Project
