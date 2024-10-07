@@ -72,3 +72,4 @@ $RECYCLE.BIN/
 *.lnk
 
 __pycache__/
+venv/

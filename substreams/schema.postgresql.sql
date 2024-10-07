@@ -56,10 +56,3 @@ CREATE INDEX idx_receipt_actions_block_timestamp ON receipt_actions(block_timest
 CREATE INDEX idx_receipt_actions_predecessor_id ON receipt_actions(predecessor_id);
 CREATE INDEX idx_receipt_actions_receiver_id ON receipt_actions(receiver_id);
 CREATE INDEX idx_receipt_actions_method_name ON receipt_actions(method_name);
-
-CREATE TABLE api_queries (
-       id SERIAL PRIMARY KEY,
-       name VARCHAR(255),
-       query_type VARCHAR(20) NOT NULL,  -- 'sql' or 'analytics'
-       query_text TEXT NOT NULL
-);

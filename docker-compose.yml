@@ -29,17 +29,5 @@ services:
     ports:
       - "5432:5432"
 
-#  db:
-#    image: clickhouse/clickhouse-server:latest
-#    environment:
-#      - CLICKHOUSE_USER=default
-#      - CLICKHOUSE_PASSWORD=
-#      - CLICKHOUSE_DB=near_watch
-#    volumes:
-#      - db_data:/var/lib/clickhouse
-#    ports:
-#      - "8123:8123"
-#      - "9000:9000"
-
 volumes:
   db_data:

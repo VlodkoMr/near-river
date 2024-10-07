@@ -6,3 +6,4 @@ dask
 dask[dataframe]
 tortoise-orm
 asyncpg
+PyPika

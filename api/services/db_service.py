@@ -49,4 +49,4 @@ class DatabaseService:
         """
         connection = Tortoise.get_connection('default')  # Default connection name
         result = await connection.execute_query(query, *args)
-        return result
+        return result[1] if len(result) == 2 else result[0]

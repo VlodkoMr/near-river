@@ -1,13 +1,15 @@
 from fastapi import FastAPI
-from routes import analytics, blocks, transactions
+from routes import block, transaction, account
 
 app = FastAPI()
 
+
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Near Watch API"}
+    return {"message": "Welcome! Visit /docs for the API documentation."}
+
 
 # Routers
-app.include_router(blocks.router, prefix="/blocks", tags=["blocks"])
-app.include_router(transactions.router, prefix="/transactions", tags=["transactions"])
-app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
+app.include_router(block.router, prefix="/block", tags=["blocks"])
+app.include_router(transaction.router, prefix="/transaction", tags=["transactions"])
+app.include_router(account.router, prefix="/account", tags=["accounts"])

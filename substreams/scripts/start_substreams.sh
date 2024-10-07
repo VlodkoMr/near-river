@@ -25,8 +25,8 @@ fi
 # Generate Rust environment constants
 cat > ./src/env.rs <<EOL
 pub const MAX_ARGS_LENGTH: usize = ${MAX_ARGS_LENGTH};
-pub const FILTERED_RECEIVER_IDS: &[&str] = &[$(echo "\"${FILTERED_RECEIVER_IDS//,/\", \"}\"")];
-pub const FILTERED_METHOD_NAMES: &[&str] = &[$(echo "\"${FILTERED_METHOD_NAMES//,/\", \"}\"")];
+pub const FILTERED_RECEIVER_IDS: &[&str] = &[$(if [ -z "$FILTERED_RECEIVER_IDS" ]; then echo ""; else echo "\"${FILTERED_RECEIVER_IDS//,/\", \"}\""; fi)];
+pub const FILTERED_METHOD_NAMES: &[&str] = &[$(if [ -z "$FILTERED_METHOD_NAMES" ]; then echo ""; else echo "\"${FILTERED_METHOD_NAMES//,/\", \"}\""; fi)];
 EOL
 
 # Build Rust project targeting WASM
