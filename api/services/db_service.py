@@ -1,6 +1,7 @@
 from tortoise import Tortoise
 from config import conf
 
+
 class DatabaseService:
     _instance = None
 
