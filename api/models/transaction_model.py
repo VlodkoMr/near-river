@@ -1,6 +1,7 @@
 from tortoise import fields
 from tortoise.models import Model
 
+
 class TransactionModel(Model):
     block_height = fields.BigIntField()
     block_timestamp = fields.DatetimeField()

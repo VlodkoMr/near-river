@@ -1,6 +1,7 @@
-## NEAR Watch API
+## NEAR River API
 
 Installation:
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate

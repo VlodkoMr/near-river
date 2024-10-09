@@ -19,6 +19,14 @@ get_latest_block() {
 if [[ "$START_BLOCK" == "latest" ]]; then
   START_BLOCK=$(get_latest_block)
   [[ -z "$START_BLOCK" ]] && { echo "Failed to fetch the latest block."; exit 1; }
+
+  if [[ -n "$END_BLOCK" ]]; then
+    if (( END_BLOCK <= START_BLOCK )); then
+      echo "Error: END_BLOCK ($END_BLOCK) must be greater than START_BLOCK ($START_BLOCK)."
+      exit 1
+    fi
+  fi
+
   echo "Fetched latest block number: $START_BLOCK"
 fi
 
@@ -39,9 +47,8 @@ INIT_LOCK_FILE="./substreams_init.lock"
 # Perform initialization if not already done
 if [[ ! -f "$INIT_LOCK_FILE" ]]; then
   echo "Starting substreams-sink-sql setup..."
-  for yaml_file in ./substreams.clickhouse.yaml ./substreams.postgresql.yaml; do
-    sed -i "s/initialBlock: .*/initialBlock: $START_BLOCK/" "$yaml_file"
-  done
+
+  sed -i "s/initialBlock: .*/initialBlock: $START_BLOCK/" ./substreams.postgresql.yaml
   echo "Updated initialBlock to $START_BLOCK in YAML files."
 
   substreams-sink-sql setup "$DB_CONNECTION" ./substreams.postgresql.yaml || { echo "substreams-sink-sql setup failed"; exit 1; }

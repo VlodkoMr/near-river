@@ -5,6 +5,8 @@ DROP TABLE IF EXISTS cursors;
 DROP TABLE IF EXISTS substreams_history;
 DROP TABLE IF EXISTS api_queries;
 
+CREATE EXTENSION IF NOT EXISTS vector;
+
 CREATE TABLE blocks (
       block_height BIGINT UNIQUE NOT NULL,
       block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -31,6 +33,7 @@ CREATE TABLE transactions (
 CREATE INDEX idx_transactions_block_timestamp ON transactions(block_timestamp);
 CREATE INDEX idx_transactions_signer_id ON transactions(signer_id);
 CREATE INDEX idx_transactions_receiver_id ON transactions(receiver_id);
+CREATE INDEX idx_transactions_signer_receiver ON transactions(signer_id, receiver_id);
 
 CREATE TABLE receipt_actions (
       id TEXT UNIQUE NOT NULL,
@@ -48,6 +51,8 @@ CREATE TABLE receipt_actions (
       deposit DOUBLE PRECISION NOT NULL,
       stake DOUBLE PRECISION NOT NULL,
       status VARCHAR(20) NOT NULL,
+      tx_data_vector VECTOR(384),
+      args_vector VECTOR(384),
       PRIMARY KEY (id),
       FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE
 );
@@ -56,3 +61,6 @@ CREATE INDEX idx_receipt_actions_block_timestamp ON receipt_actions(block_timest
 CREATE INDEX idx_receipt_actions_predecessor_id ON receipt_actions(predecessor_id);
 CREATE INDEX idx_receipt_actions_receiver_id ON receipt_actions(receiver_id);
 CREATE INDEX idx_receipt_actions_method_name ON receipt_actions(method_name);
+CREATE INDEX idx_receipt_actions_predecessor_receiver ON receipt_actions(predecessor_id, receiver_id);
+CREATE INDEX idx_receipt_actions_args_vector ON receipt_actions USING ivfflat (args_vector vector_l2_ops) WITH (lists = 100);
+CREATE INDEX idx_receipt_actions_tx_data_vector ON receipt_actions USING ivfflat (tx_data_vector vector_l2_ops) WITH (lists = 100);

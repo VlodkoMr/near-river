@@ -1,7 +1,7 @@
 services:
   api:
     build: ./api
-    command: ["sh", "-c", "./scripts/start_api.sh"]
+    command: [ "sh", "-c", "./scripts/start_api.sh" ]
     volumes:
       - ./api:/app
     ports:
@@ -11,21 +11,21 @@ services:
 
   substreams:
     build: ./substreams
-    command: ["sh", "-c", "./scripts/start_substreams.sh"]
+    command: [ "sh", "-c", "./scripts/start_substreams.sh" ]
     volumes:
       - ./substreams:/app
     depends_on:
       - db
 
   db:
-    image: postgres:17-alpine
-    restart: unless-stopped
+    image: ankane/pgvector:latest
+    restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=near_watch
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: near_river
     volumes:
-      - db_data:/var/lib/postgresql/data/
+      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 

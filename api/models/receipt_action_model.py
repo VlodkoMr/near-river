@@ -1,6 +1,7 @@
 from tortoise import fields
 from tortoise.models import Model
 
+
 class ReceiptActionModel(Model):
     id = fields.TextField(pk=True)
     block_height = fields.BigIntField()
@@ -17,6 +18,8 @@ class ReceiptActionModel(Model):
     deposit = fields.FloatField()
     stake = fields.FloatField()
     status = fields.CharField(max_length=20)
+    args_vector = fields.JSONField(null=True)
+    tx_data_vector = fields.JSONField(null=True)
 
     class Meta:
         table = "receipt_actions"
