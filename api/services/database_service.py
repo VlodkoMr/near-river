@@ -1,5 +1,5 @@
 from tortoise import Tortoise
-from config import conf
+from config.settings import conf
 
 
 class DatabaseService:

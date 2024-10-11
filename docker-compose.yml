@@ -4,6 +4,7 @@ services:
     command: [ "sh", "-c", "./scripts/start_api.sh" ]
     volumes:
       - ./api:/app
+      - ./substreams/schema.postgresql.sql:/schema.postgresql.sql
     ports:
       - "3000:3000"
     depends_on:
@@ -18,14 +19,14 @@ services:
       - db
 
   db:
-    image: ankane/pgvector:latest
-    restart: always
+    image: postgres:17-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: near_river
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=near_river
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
 

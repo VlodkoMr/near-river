@@ -1,9 +1,10 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException
 
-from config import conf
+from fastapi import APIRouter
+
+from config.settings import conf
 from helpers.decorators import exception_handler
-from services.db_service import DatabaseService
+from services.database_service import DatabaseService
 
 router = APIRouter()
 

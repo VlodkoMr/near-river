@@ -73,3 +73,6 @@ $RECYCLE.BIN/
 
 __pycache__/
 venv/
+.cache/
+api/schema.postgresql.sql
+api/config/ai_models/

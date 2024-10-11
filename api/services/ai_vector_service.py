@@ -1,5 +1,6 @@
 import json
 import logging
+from functools import lru_cache
 from itertools import zip_longest
 
 from sentence_transformers import SentenceTransformer
@@ -38,6 +39,7 @@ class AiVectorService:
             # For non-dict and non-list values, return them as plain text
             return '  ' * level + str(data)
 
+    @lru_cache(maxsize=10000)
     def _preprocess_args(self, args: str):
         """
         Process JSON arguments and format them with key as title and value as text.
@@ -49,6 +51,7 @@ class AiVectorService:
         except (json.JSONDecodeError, TypeError):
             return args
 
+    @lru_cache(maxsize=10000)
     def _preprocess_tx_data(self, action):
         """
         Preprocess tx data and associated fields (action_kind, social_kind, etc.) into a structured text format.

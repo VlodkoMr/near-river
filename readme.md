@@ -24,6 +24,7 @@ You can customise to filter and storing any data that you need in a database, an
 ## Requirements
 
 - Docker
+- huggingface-cli
 
 ## Installation
 

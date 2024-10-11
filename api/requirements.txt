@@ -3,5 +3,8 @@ uvicorn
 python-dotenv
 tortoise-orm
 asyncpg
-sentence-transformers
 aiohttp
+torch
+transformers
+sentencepiece
+accelerate
