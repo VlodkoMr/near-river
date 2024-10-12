@@ -9,6 +9,13 @@ services:
       - "3000:3000"
     depends_on:
       - db
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
 
   substreams:
     build: ./substreams

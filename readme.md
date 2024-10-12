@@ -24,7 +24,7 @@ You can customise to filter and storing any data that you need in a database, an
 ## Requirements
 
 - Docker
-- huggingface-cli
+- Nvidia GPU with toolkit installed (optional, for AI model)
 
 ## Installation
 
@@ -59,8 +59,18 @@ You can customise to filter and storing any data that you need in a database, an
 
 #### Download AI Model:
 
+You can use any AI model for this project. In this example, we use a model from Hugging Face. To download it, follow these steps:
+
+- Install the Hugging Face CLI: https://huggingface.co/docs/huggingface_hub/guides/cli
+- Log in to your Hugging Face account
+
 ```bash
 huggingface-cli login
+```
+
+- Download the model to /api/config/ai_models directory:
+
+```bash
 huggingface-cli download defog/sqlcoder-7b-2 --local-dir api/config/ai_models/sqlcoder-7b-2
 ```
 
