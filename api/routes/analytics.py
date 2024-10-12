@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
 import argparse
 
 from fastapi import APIRouter
@@ -29,7 +29,23 @@ async def get_analytics_question(request: QuestionRequest):
 
 
 def run_inference(question):
-    tokenizer, model = get_tokenizer_model("config/ai_models/sqlcoder-7b-2")
+    model_id = "config/ai_models/sqlcoder-7b-2"
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bits=True,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16,
+    )
+
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    tokenizer.pad_token = tokenizer.eos_token
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id,
+        quantization_config=bnb_config,
+        device_map="auto",
+    )
+
+    # tokenizer, model = get_tokenizer_model(model_id)
     prompt_file = "config/ai_data/prompt.md"
     metadata_file = "/schema.postgresql.sql"
     prompt = generate_prompt(question, prompt_file, metadata_file)
@@ -38,40 +54,30 @@ def run_inference(question):
 
     # make sure the model stops generating at triple ticks
     # eos_token_id = tokenizer.convert_tokens_to_ids(["```"])[0]
-    eos_token_id = tokenizer.eos_token_id
+    # eos_token_id = tokenizer.eos_token_id
 
-    print('>>>>>>>>>>>>>>>> eos_token_id ', eos_token_id)
-
-    pipe = pipeline(
+    pipe_call = pipeline(
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        max_new_tokens=300,
+        max_new_tokens=128,
         do_sample=False,
         return_full_text=False,  # added return_full_text parameter to prevent splitting issues with prompt
-        num_beams=4,  # do beam search with 5 beams for high quality results
+        num_beams=1,  # do beam search with 5 beams for high quality results
     )
 
-    print('>>>>>>>>>>>>>>>> pipe: ', pipe)
-
     generated_query = (
-            pipe(
+            pipe_call(
                 prompt,
-                num_return_sequences=1,
-                eos_token_id=eos_token_id,
-                pad_token_id=eos_token_id,
+                num_return_sequences=1
             )[0]["generated_text"]
-            .split(";")[0]
-            .split("```")[0]
-            .strip()
-            + ";"
     )
     print('>>>>>>>>>> generated_query', generated_query)
     return generated_query
 
 
 def get_tokenizer_model(model_name):
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         trust_remote_code=True,

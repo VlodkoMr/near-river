@@ -4,7 +4,8 @@ python-dotenv
 tortoise-orm
 asyncpg
 aiohttp
-torch
-transformers
-sentencepiece
-accelerate
+huggingface_hub
+transformers==4.45.2
+sentencepiece==0.2.0
+accelerate==1.0.1
+bitsandbytes

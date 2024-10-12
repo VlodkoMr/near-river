@@ -57,6 +57,13 @@ You can customise to filter and storing any data that you need in a database, an
 
 - `DB_CONNECTION` - Database connection string.
 
+#### Download AI Model:
+
+```bash
+huggingface-cli login
+huggingface-cli download defog/sqlcoder-7b-2 --local-dir api/config/ai_models/sqlcoder-7b-2
+```
+
 ## Running the Project
 
 #### Start the Application:
@@ -66,7 +73,7 @@ docker-compose build
 docker-compose up
 ```
 
-#### Stop and Clean Up:
+#### Stop the Application:
 
 ```bash
 docker-compose down --remove-orphans

@@ -4,16 +4,20 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
-    cmake  \
-    build-essential  \
-    pkg-config  \
+    cmake \
+    build-essential \
+    pkg-config \
     libgoogle-perftools-dev \
+    gfortran \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY . .
 
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt requirements.txt
+COPY scripts/start_api.sh scripts/start_api.sh
+
+RUN pip install torch --index-url https://download.pytorch.org/whl/cu124
+RUN pip install -r requirements.txt
 
 EXPOSE 3000
 
