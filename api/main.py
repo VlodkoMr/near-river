@@ -3,7 +3,6 @@ import logging
 from fastapi import FastAPI
 
 from routes import block, transaction, account, analytics
-# from services.ai_vector_service import AiVectorService
 from services.database_service import DatabaseService
 
 # from services.event_listener_service import EventListener
@@ -33,12 +32,6 @@ app.include_router(analytics.router, prefix="/analytic", tags=["analytics"])
 async def startup_event():
     await DatabaseService.initialize()
 
-    # Start embedding generation as a background task
-    # if conf.ENABLE_AI_PROCESSING:
-    #     asyncio.create_task(generate_ai_vectors_process())
-    # else:
-    #     logger.info("AI processing is disabled, embedding generation will not run.")
-
     # Start event listeners as a background task
     # if conf.ENABLE_EVENT_LISTENER:
     #     asyncio.create_task(start_event_listener_process())
@@ -52,16 +45,6 @@ async def shutdown_event():
     # Close database connections
     await DatabaseService.shutdown()
     logger.info("Database connections closed.")
-
-# ----------------- Background tasks - generate data for AI ----------------
-
-# async def generate_ai_vectors_process(batch_size: int = 1000):
-#     while True:
-#         try:
-#             await AiVectorService().generate_vectors_for_receipt_actions(batch_size=batch_size)
-#         except Exception as e:
-#             logger.error(f"Error during embedding generation: {e}")
-#         await asyncio.sleep(30)  # Wait for 30 second before next cycle
 
 # ------------------- Background tasks - Events Listener -------------------
 

@@ -1,25 +1,27 @@
 # NEAR River
 
-NEAR River is a powerful tool for building and quickly launching custom indexers on the NEAR blockchain using Substreams.
-It provides an easy-to-use interface for get any data (historical or live) on NEAR blockchain: blocks, transactions and receipts.
-You can customise to filter and storing any data that you need in a database, and querying through a pre-built, extendable API.
+NEAR River is a robust solution for quickly building and launching custom indexers with API for the NEAR blockchain.
+It offers a user-friendly interface to access any data — whether historical or live, using Substreams for blocks, transactions, and receipts. 
+You can easily customize filters, store the exact data you need in a database, and query through a pre-built, 
+extendable API with integrated AI support. 
 
 ### Key Features:
 
-- Simplest setup for custom NEAR indexer: just edit `.env` files and run docker!
-- Pre-build API with endpoints customisation: get transactions, receipts, blocks, and general KPI data.
-- Scalable and flexible design: you can extend indexer and API with your custom logic, project is open-source.
-- Access to all historical NEAR blockchain data without the need to run a node.
-- Optimized data storage for reduced size. All NEAR blockchain data can be stored in 500Gb drive!
-- NEAR Social support - parse all `social.near` events for better search and filtering.
-- AI to get powerful data analytics and insights.
+- **Effortless Custom NEAR Indexer Setup:** Just edit the .env files and run Docker — it's that simple!
+- **Pre-built API with Customizable Endpoints:** Access transactions, receipts, blocks, and general blockchain data.
+- **Scalable and Flexible Architecture:** Extend both the indexer and API with your custom logic — it's fully open-source.
+- **Comprehensive Blockchain Data Access:** Retrieve any historical or real-time data using Substreams without the need to run your own node.
+- **Optimized Data Storage:** Efficiently store all useful NEAR blockchain data in just 500GB of drive space.
+- **NEAR Social Integration:** Parse `social.near` events for enhanced search and filtering capabilities.
+- **AI-Powered Analytics:** Gain valuable insights and data analytics directly from your setup with integrated AI.
+- **No External API Usage for AI:** Enjoy unlimited AI queries without rate or data limits, and no extra costs — the AI runs on your own machine!
 
 ### Comparison with Existing NEAR Indexer/API Solutions:
 
-- **BigQuery** - Expensive when reading large amounts of data.
-- **QueryAPI** - Unstable (under beta testing), no control on indexing (no way to stop or restart indexer).
-- **Lake Framework** - Complex setup, relies on AWS. Require archival node to get historical data.
-- **Pikespeak API** - A great solution, but not open-source or extendable for custom needs, paid.
+- **BigQuery:** Costly for reading large volumes of data, with no option to export extensive datasets.
+- **QueryAPI:** Currently unstable (still in beta), with limited control over the indexing process—no ability to stop or restart the indexer.
+- **Lake Framework:** Involves a complex setup, dependent on AWS, and requires an archival node for accessing historical data.
+- **Pikespeak API:** A solid solution, but it's not open-source or customizable for unique use cases, and it comes with a price tag.
 
 ## Requirements
 
@@ -59,16 +61,16 @@ You can customise to filter and storing any data that you need in a database, an
 
 #### Download AI Model:
 
-You can use any AI model for this project. In this example, we use a model from Hugging Face. To download it, follow these steps:
+You can use any AI model for this project. In our example, we use "sqlcoder-7b-2" from Hugging Face. To download it, follow these steps:
 
 - Install the Hugging Face CLI: https://huggingface.co/docs/huggingface_hub/guides/cli
-- Log in to your Hugging Face account
+- Log in to your Hugging Face account:
 
 ```bash
 huggingface-cli login
 ```
 
-- Download the model to /api/config/ai_models directory:
+- Download the model to /api/config/ai_models/ directory:
 
 ```bash
 huggingface-cli download defog/sqlcoder-7b-2 --local-dir api/config/ai_models/sqlcoder-7b-2
@@ -83,12 +85,6 @@ docker-compose build
 docker-compose up
 ```
 
-#### Stop the Application:
-
-```bash
-docker-compose down --remove-orphans
-```
-
 #### Reset the Database:
 
 ```bash
@@ -98,19 +94,18 @@ docker-compose up
 
 #### Usage
 
-http://localhost:3000/ - API endpoint
-http://localhost:3000/docs - API documentation
+After running docker - substreams will begin collecting data from the NEAR blockchain, using the configurations from your environment settings. 
+API endpoints will be available for querying the database, all endpoints are documented in the [http://localhost:3000/docs](http://localhost:3000/docs).
 
 ### Why Choose NEAR River?
 
 NEAR River is easy to set up, letting you run an indexer just in 10 minutes with real-time, stable data flow to your database.
 It’s scalable, flexible, and designed to handle any amount of data with real-time updates.
-The pre-built API makes querying easy, and data storage is optimized for your data.
+The pre-built API makes querying easy, and data storage is optimized for reduced size.
 
-API contain AI and event listeners:
-
-- In background tasks we process, transform and store vector data for AI.
-- Event listeners can be used to trigger calls to NEAR/EVM chains based on your custom logic.
+API with AI and Event Listeners:
+- AI-Powered Data Querying: You can interact with the AI to ask about any data from the NEAR blockchain. The AI will generate the appropriate SQL query and return the most relevant results from your database.
+- Custom Event Listeners: Set up event listeners to trigger calls to NEAR or EVM-compatible chains based on your custom logic, enabling automated workflows.
 
 ## TODO
 
