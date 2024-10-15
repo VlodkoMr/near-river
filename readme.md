@@ -26,7 +26,7 @@ extendable API with integrated AI support.
 ## Requirements
 
 - Docker
-- Nvidia GPU with toolkit installed (optional, for AI model)
+- CUDA toolkit + NVidia GPU (for AI model), only Linux and Windows are supported for now.
 
 ## Installation
 
@@ -37,11 +37,12 @@ extendable API with integrated AI support.
     ```bash
     git clone https://github.com/VlodkoMr/near-river.git
     ```
-3. Copy `.env.example` to `.env` and update it with your configurations:
+3. Copy `.env.example` to `.env`, update it with your configurations and run docker build:
 
     ```bash
     cp substreams/.env.example substreams/.env
     cp api/.env.example api/.env
+    docker-compose build
     ```
 
 ### Substreams environment (substreams/.env file)
@@ -78,28 +79,37 @@ huggingface-cli download defog/sqlcoder-7b-2 --local-dir api/config/ai_models/sq
 
 ## Running the Project
 
-#### Start the Application:
+#### Start with GPU (see requirements):
 
 ```bash
-docker-compose build
+docker-compose -f docker-compose.yml -f docker-compose.gpu.yml up
+```
+
+#### Start without GPU:
+
+```bash
 docker-compose up
 ```
 
 #### Reset the Database:
 
+To reset the database, remove the `substreams_init.lock` file and restart docker:
+
 ```bash
+# stop docker
 rm ./substreams/substreams_init.lock
-docker-compose up
+# start docker
 ```
 
 #### Usage
 
 After running docker - substreams will begin collecting data from the NEAR blockchain, using the configurations from your environment settings. 
 API endpoints will be available for querying the database, all endpoints are documented in the [http://localhost:3000/docs](http://localhost:3000/docs).
+If you run docker with GPU support, you can use the AI-powered API to query the database with AI-generated SQL queries, ask questions about the data, and get insights.
 
 ### Why Choose NEAR River?
 
-NEAR River is easy to set up, letting you run an indexer just in 10 minutes with real-time, stable data flow to your database.
+NEAR River is easy to set up, letting you run an indexer just in 7 minutes with real-time, stable data flow to your database.
 It’s scalable, flexible, and designed to handle any amount of data with real-time updates.
 The pre-built API makes querying easy, and data storage is optimized for reduced size.
 
