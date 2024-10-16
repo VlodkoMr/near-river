@@ -127,7 +127,6 @@ fn process_receipt_actions(
             if let Some(receipt_action) = &receipt.receipt {
                 if let ReceiptTypes::Action(action_receipt) = receipt_action {
                     for action in action_receipt.actions.iter() {
-                        // Pass receipt_to_tx_map to transform_action
                         let transformed_action = transform_action(
                             action,
                             block_meta,

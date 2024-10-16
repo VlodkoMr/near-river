@@ -65,7 +65,7 @@ pub fn transform_action(
 
     let tx_hash = receipt_to_tx_map.get(&receipt_id_hash)
         .cloned()
-        .or_else(|| bs58_hash_to_string(Some(receipt.receipt_id.clone())))
+        .or_else(|| Some(bs58_hash_to_string(receipt.receipt_id.clone())))
         .unwrap_or_else(|| "".to_string());
 
     ReceiptActionMeta {

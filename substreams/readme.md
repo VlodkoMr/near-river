@@ -32,19 +32,19 @@ Note: To get SUBSTREAMS_API_TOKEN, you need to follow [Substreams Auth Documenta
 #### Postgresql create database:
 
 ```bash
-substreams-sink-sql setup "psql://postgres:secret@127.0.0.1:5432/substreams_example?sslmode=disable" ./substreams.postgresql.yaml
+substreams-sink-sql setup "psql://postgres:secret@127.0.0.1:5432/near_river?sslmode=disable" ./substreams.postgresql.yaml
 ```
 
 #### Postgresql start data sync:
 
 ```bash
-substreams-sink-sql run "psql://postgres:secret@127.0.0.1:5432/substreams_example?sslmode=disable" ./substreams.postgresql.yaml
+substreams-sink-sql run "psql://postgres:secret@127.0.0.1:5432/near_river?sslmode=disable" ./substreams.postgresql.yaml
 ```
 
 #### Postgresql resume data sync:
 
 ```bash
-substreams-sink-sql run "psql://postgres:secret@127.0.0.1:5432/substreams_example?sslmode=disable" ./substreams.postgresql.yaml \
+substreams-sink-sql run "psql://postgres:secret@127.0.0.1:5432/near_river?sslmode=disable" ./substreams.postgresql.yaml \
 --on-module-hash-mistmatch warn
 ```
 
