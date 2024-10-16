@@ -5,7 +5,14 @@ use substreams_near::pb::sf::near::r#type::v1::action::Action as ActionTypes;
 use crate::utils::block_timestamp::BlockTimestamp;
 use crate::utils::helpers::{bs58_hash_to_string, bytes_to_near_amount, extract_function_call_args, extract_social_kind};
 
-pub fn transform_action(action: &Action, block: &BlockMeta, receipt: &Receipt, all_statuses: &HashMap<String, String>, action_index: u64) -> ReceiptActionMeta {
+pub fn transform_action(
+    action: &Action,
+    block: &BlockMeta,
+    receipt: &Receipt,
+    all_statuses: &HashMap<String, String>,
+    action_index: u64,
+    receipt_to_tx_map: &HashMap<String, String>,
+) -> ReceiptActionMeta {
     let receipt_id_hash = bs58_hash_to_string(receipt.receipt_id.clone());
 
     let action_kind = match &action.action {
@@ -41,7 +48,7 @@ pub fn transform_action(action: &Action, block: &BlockMeta, receipt: &Receipt, a
     let gas: u32 = match &action.action {
         Some(ActionTypes::FunctionCall(function_call)) => {
             function_call.gas.checked_div(1_000_000_000_000).unwrap_or(0) as u32
-        },
+        }
         _ => 0,
     };
 
@@ -55,6 +62,11 @@ pub fn transform_action(action: &Action, block: &BlockMeta, receipt: &Receipt, a
         Some(ActionTypes::Stake(stake)) => bytes_to_near_amount(stake.stake.clone().unwrap().bytes),
         _ => 0.0,
     };
+
+    let tx_hash = receipt_to_tx_map.get(&receipt_id_hash)
+        .cloned()
+        .or_else(|| bs58_hash_to_string(Some(receipt.receipt_id.clone())))
+        .unwrap_or_else(|| "".to_string());
 
     ReceiptActionMeta {
         block_timestamp: block.block_timestamp,
@@ -71,6 +83,7 @@ pub fn transform_action(action: &Action, block: &BlockMeta, receipt: &Receipt, a
         deposit,
         stake,
         status,
+        tx_hash,
     }
 }
 
@@ -78,7 +91,7 @@ pub fn transform_transaction(
     blk_timestamp: &BlockTimestamp,
     height: &u64,
     transaction: &SignedTransaction,
-    outcome: &Option<ExecutionOutcome>
+    outcome: &Option<ExecutionOutcome>,
 ) -> Option<TransactionMeta> {
     let tx_hash = bs58_hash_to_string(transaction.hash.clone());
 

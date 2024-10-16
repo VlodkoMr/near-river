@@ -62,6 +62,8 @@ pub struct ReceiptActionMeta {
     pub stake: f64,
     #[prost(string, tag="14")]
     pub status: ::prost::alloc::string::String,
+    #[prost(string, tag="15")]
+    pub tx_hash: ::prost::alloc::string::String,
 }
 /// General block data output
 #[allow(clippy::derive_partial_eq_without_eq)]

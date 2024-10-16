@@ -3,7 +3,7 @@ mod utils;
 mod env;
 
 use std::collections::HashMap;
-use substreams_near::pb::sf::near::r#type::v1::{Block, BlockHeader, IndexerChunk, IndexerShard, SignedTransaction};
+use substreams_near::pb::sf::near::r#type::v1::{Block, BlockHeader, IndexerChunk, IndexerExecutionOutcomeWithReceipt, IndexerShard, SignedTransaction};
 use substreams_database_change::pb::database::{DatabaseChanges, table_change::Operation};
 use substreams_near::pb::sf::near::r#type::v1::execution_outcome::Status;
 use crate::pb::near::custom::v1::{BlockDataOutput, BlockMeta, ReceiptActionMeta, TransactionMeta};
@@ -29,6 +29,7 @@ fn store_transactions(blk: Block) -> BlockDataOutput {
             };
 
             let mut all_statuses = HashMap::new();
+            let mut receipt_to_tx_map = HashMap::new();
 
             // Process transactions and receipt actions from shards
             let (transactions, receipt_actions) = blk.shards.iter().fold(
@@ -36,15 +37,28 @@ fn store_transactions(blk: Block) -> BlockDataOutput {
                 |(mut all_transactions, mut all_actions), shard| {
                     collect_statuses(shard, &mut all_statuses);
                     if let Some(chunk) = &shard.chunk {
-                        process_transactions(chunk, &timestamp, block_header, &mut all_transactions);
-                        process_receipt_actions(chunk, &block_meta, &mut all_actions, &all_statuses);
+                        process_transactions(
+                            chunk,
+                            &timestamp,
+                            block_header,
+                            &mut all_transactions,
+                            &mut receipt_to_tx_map,
+                        );
+
+                        process_receipt_actions(
+                            &block_meta,
+                            &mut all_actions,
+                            &all_statuses,
+                            &receipt_to_tx_map,
+                            &shard.receipt_execution_outcomes,
+                        );
                     }
                     (all_transactions, all_actions)
-                }
+                },
             );
 
             (transactions, receipt_actions, Some(block_meta))
-        }
+        },
     );
 
     BlockDataOutput {
@@ -76,13 +90,20 @@ fn process_transactions(
     chunk: &IndexerChunk,
     timestamp: &BlockTimestamp,
     block_header: &BlockHeader,
-    all_transactions: &mut Vec<TransactionMeta>
+    all_transactions: &mut Vec<TransactionMeta>,
+    receipt_to_tx_map: &mut HashMap<String, String>,
 ) {
     chunk.transactions.iter().filter_map(|tx_with_outcome| {
         tx_with_outcome.transaction.as_ref().and_then(|transaction| {
             if should_process_transaction(transaction) {
                 tx_with_outcome.outcome.as_ref()?.execution_outcome.as_ref().and_then(|outcome_with_id| {
-                    transform_transaction(timestamp, &block_header.height, transaction, &outcome_with_id.outcome)
+                    let tx_meta = transform_transaction(timestamp, &block_header.height, transaction, &outcome_with_id.outcome)?;
+                    // Map each receipt_id to the transaction hash
+                    for receipt_id in outcome_with_id.clone().outcome.unwrap().receipt_ids.iter() {
+                        let receipt_id_str = bs58_hash_to_string(Some(receipt_id.clone()));
+                        receipt_to_tx_map.insert(receipt_id_str, tx_meta.tx_hash.clone());
+                    }
+                    Some(tx_meta)
                 })
             } else {
                 None
@@ -93,30 +114,37 @@ fn process_transactions(
 
 // Process receipt actions in a chunk
 fn process_receipt_actions(
-    chunk: &IndexerChunk,
     block_meta: &BlockMeta,
     all_actions: &mut Vec<ReceiptActionMeta>,
-    all_statuses: &HashMap<String, String>
+    all_statuses: &HashMap<String, String>,
+    receipt_to_tx_map: &HashMap<String, String>,
+    receipt_execution_outcomes: &Vec<IndexerExecutionOutcomeWithReceipt>,
 ) {
     let mut action_index = all_actions.len() as u64 + 1;
 
-    chunk.receipts.iter().filter_map(|receipt| {
-        receipt.receipt.as_ref().and_then(|receipt_action| match receipt_action {
-            ReceiptTypes::Action(action_receipt) => {
-                let actions = action_receipt.actions.iter().filter_map(|action| {
-                    let transformed_action = transform_action(action, block_meta, receipt, all_statuses, action_index);
-                    action_index += 1;
-                    if should_process_action(&transformed_action) {
-                        Some(transformed_action)
-                    } else {
-                        None
+    for outcome_with_receipt in receipt_execution_outcomes.iter() {
+        if let Some(receipt) = &outcome_with_receipt.receipt {
+            if let Some(receipt_action) = &receipt.receipt {
+                if let ReceiptTypes::Action(action_receipt) = receipt_action {
+                    for action in action_receipt.actions.iter() {
+                        // Pass receipt_to_tx_map to transform_action
+                        let transformed_action = transform_action(
+                            action,
+                            block_meta,
+                            receipt,
+                            all_statuses,
+                            action_index,
+                            receipt_to_tx_map,
+                        );
+                        action_index += 1;
+                        if should_process_action(&transformed_action) {
+                            all_actions.push(transformed_action);
+                        }
                     }
-                }).collect::<Vec<_>>();
-                if actions.is_empty() { None } else { Some(actions) }
-            },
-            _ => None,
-        })
-    }).flatten().for_each(|action| all_actions.push(action));
+                }
+            }
+        }
+    }
 }
 
 // Check if a transaction should be processed
@@ -206,5 +234,6 @@ fn push_action_create(
         .change("status", (None, action.status.to_string()))
         .change("gas", (None, action.gas))
         .change("deposit", (None, action.deposit.to_string()))
-        .change("stake", (None, action.stake.to_string()));
+        .change("stake", (None, action.stake.to_string()))
+        .change("tx_hash", (None, &action.tx_hash));
 }

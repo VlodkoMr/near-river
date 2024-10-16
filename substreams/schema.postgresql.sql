@@ -38,6 +38,7 @@ CREATE TABLE receipt_actions (
     id TEXT UNIQUE NOT NULL, -- Unique internal action ID, not exposed publicly and not used in queries
     block_height BIGINT NOT NULL, -- Block height associated with this action, part of the block
     block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL, -- Timestamp when this action occurred, matching the block and transaction timestamps
+    tx_hash TEXT NOT NULL, -- Unique transaction hash used to identify the transaction, each receipt action related to the transaction
     receipt_id TEXT NOT NULL, -- Receipt ID generated for this action, associated with transaction execution
     predecessor_id VARCHAR(64) NOT NULL, -- Wallet address (user) or smart-contract address of the transaction's sender (signer or predecessor)
     receiver_id VARCHAR(64) NOT NULL, -- Wallet address (user) or smart-contract address of the transaction's receiver (recipient)

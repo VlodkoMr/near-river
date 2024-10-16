@@ -575,7 +575,7 @@ pub mod failure_execution_status {
 pub struct ActionError {
     #[prost(uint64, tag="1")]
     pub index: u64,
-    #[prost(oneof="action_error::Kind", tags="21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42")]
+    #[prost(oneof="action_error::Kind", tags="21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43")]
     pub kind: ::core::option::Option<action_error::Kind>,
 }
 /// Nested message and enum types in `ActionError`.
@@ -627,6 +627,8 @@ pub mod action_error {
         DelegateActionInvalidNonce(super::DelegateActionInvalidNonceKind),
         #[prost(message, tag="42")]
         DelegateActionNonceTooLarge(super::DelegateActionNonceTooLargeKind),
+        #[prost(message, tag="43")]
+        NonRefundableTransferToExistingAccount(super::NonRefundableTransferToExistingAccountKind),
     }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -788,6 +790,12 @@ pub struct DelegateActionNonceTooLargeKind {
     pub delegate_nonce: u64,
     #[prost(uint64, tag="2")]
     pub upper_bound: u64,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct NonRefundableTransferToExistingAccountKind {
+    #[prost(string, tag="1")]
+    pub account_id: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1058,6 +1066,7 @@ pub enum ReceiptValidationError {
     ReturnedValueLengthExceeded = 4,
     NumberInputDataDependenciesExceeded = 5,
     ActionsValidationError = 6,
+    ReceiptSizeExceeded = 7,
 }
 impl ReceiptValidationError {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -1073,6 +1082,7 @@ impl ReceiptValidationError {
             ReceiptValidationError::ReturnedValueLengthExceeded => "ReturnedValueLengthExceeded",
             ReceiptValidationError::NumberInputDataDependenciesExceeded => "NumberInputDataDependenciesExceeded",
             ReceiptValidationError::ActionsValidationError => "ActionsValidationError",
+            ReceiptValidationError::ReceiptSizeExceeded => "ReceiptSizeExceeded",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -1085,6 +1095,7 @@ impl ReceiptValidationError {
             "ReturnedValueLengthExceeded" => Some(Self::ReturnedValueLengthExceeded),
             "NumberInputDataDependenciesExceeded" => Some(Self::NumberInputDataDependenciesExceeded),
             "ActionsValidationError" => Some(Self::ActionsValidationError),
+            "ReceiptSizeExceeded" => Some(Self::ReceiptSizeExceeded),
             _ => None,
         }
     }
@@ -1107,6 +1118,10 @@ pub enum InvalidTxError {
     Expired = 11,
     ActionsValidation = 12,
     TransactionSizeExceeded = 13,
+    InvalidTransactionVersion = 14,
+    StorageError = 15,
+    ShardCongested = 16,
+    ShardStuck = 17,
 }
 impl InvalidTxError {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -1129,6 +1144,10 @@ impl InvalidTxError {
             InvalidTxError::Expired => "Expired",
             InvalidTxError::ActionsValidation => "ActionsValidation",
             InvalidTxError::TransactionSizeExceeded => "TransactionSizeExceeded",
+            InvalidTxError::InvalidTransactionVersion => "InvalidTransactionVersion",
+            InvalidTxError::StorageError => "StorageError",
+            InvalidTxError::ShardCongested => "ShardCongested",
+            InvalidTxError::ShardStuck => "ShardStuck",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -1148,6 +1167,10 @@ impl InvalidTxError {
             "Expired" => Some(Self::Expired),
             "ActionsValidation" => Some(Self::ActionsValidation),
             "TransactionSizeExceeded" => Some(Self::TransactionSizeExceeded),
+            "InvalidTransactionVersion" => Some(Self::InvalidTransactionVersion),
+            "StorageError" => Some(Self::StorageError),
+            "ShardCongested" => Some(Self::ShardCongested),
+            "ShardStuck" => Some(Self::ShardStuck),
             _ => None,
         }
     }

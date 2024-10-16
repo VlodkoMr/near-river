@@ -33,7 +33,7 @@ if gpu_enabled:
 
 
 class QuestionRequest(BaseModel):
-    question: str = "Select latest 10 publications on near social"
+    question: str = ""
 
 
 @router.post("/ask")
@@ -42,6 +42,9 @@ async def get_analytics_question(request: QuestionRequest):
     if not gpu_enabled:
         raise HTTPException(status_code=503, detail="GPU is not available. AI requires GPU to process the request.")
 
+    if request.question == "":
+        raise HTTPException(status_code=400, detail="Question is required to process the request.")
+
     question = request.question
     print(f"Received question: {question}")
 
@@ -49,8 +52,6 @@ async def get_analytics_question(request: QuestionRequest):
     parser = argparse.ArgumentParser(description="Run inference on a question")
     parser.add_argument("-q", "--question", type=str, default=_default_question, help="Question to run inference on")
     result = run_inference(question)
-
-    print('RESULTS: ', result)
 
     return {"question": question, "answer": result}
 
@@ -68,10 +69,10 @@ def run_inference(question):
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        max_new_tokens=128,
+        max_new_tokens=512,
         do_sample=False,
-        return_full_text=False,  # added return_full_text parameter to prevent splitting issues with prompt
-        num_beams=1,  # do beam search with 5 beams for high quality results
+        return_full_text=False,
+        num_beams=1,
     )
 
     generated_query = (
@@ -93,4 +94,5 @@ def generate_prompt(question, prompt_file, metadata_file):
     prompt = prompt.format(
         user_question=question, table_metadata_string=table_metadata_string
     )
+    print(prompt)
     return prompt
