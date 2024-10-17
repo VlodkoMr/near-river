@@ -48,6 +48,6 @@ class DatabaseService:
         :param args: Optional parameters for the query
         :return: The query result
         """
-        connection = Tortoise.get_connection('default')  # Default connection name
+        connection = Tortoise.get_connection('default')
         result = await connection.execute_query(query, *args)
         return result[1] if len(result) == 2 else result[0]

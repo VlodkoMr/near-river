@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS substreams_history;
 DROP TABLE IF EXISTS api_queries;
 
 CREATE TABLE blocks (
-    block_height BIGINT UNIQUE NOT NULL, -- Block height: the sequential block number in the NEAR blockchain
+    block_height BIGINT UNIQUE NOT NULL, -- Block height
     block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL, -- The timestamp when the block was produced
     block_hash TEXT NOT NULL UNIQUE, -- Unique hash of the block used for block identification
     author_account_id VARCHAR(64) NOT NULL, -- Account ID of the block producer (validator)
@@ -38,7 +38,7 @@ CREATE TABLE receipt_actions (
     id TEXT UNIQUE NOT NULL, -- Unique internal action ID, not exposed publicly and not used in queries
     block_height BIGINT NOT NULL, -- Block height associated with this action, part of the block
     block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL, -- Timestamp when this action occurred, matching the block and transaction timestamps
-    tx_hash TEXT NOT NULL, -- Unique transaction hash used to identify the transaction, each receipt action related to the transaction
+    tx_hash TEXT NOT NULL, -- Transaction hash used to identify the transaction, each receipt action related to the transaction
     receipt_id TEXT NOT NULL, -- Receipt ID generated for this action, associated with transaction execution
     predecessor_id VARCHAR(64) NOT NULL, -- Wallet address (user) or smart-contract address of the transaction's sender (signer or predecessor)
     receiver_id VARCHAR(64) NOT NULL, -- Wallet address (user) or smart-contract address of the transaction's receiver (recipient)
@@ -48,7 +48,7 @@ CREATE TABLE receipt_actions (
     args TEXT, -- JSON-formatted arguments passed to the method (if applicable)
     social_kind VARCHAR(20), -- Type of social interaction if related to social transactions (options: Post, Comment, Like, Repost, Profile, Poke, Follow, UnFollow, Widget, Notify). This actions related only to the NEAR Social (social.near calls).
     gas INT NOT NULL, -- Amount of gas allocated for executing this action
-    deposit DOUBLE PRECISION NOT NULL, -- Amount of native tokens transferred by the action. Native token is NEAR
+    deposit DOUBLE PRECISION NOT NULL, -- Amount of native tokens transferred by the action. Native token is NEAR, it is transaction transfer amount
     stake DOUBLE PRECISION NOT NULL, -- Amount of tokens staked, if this is a staking action
     status VARCHAR(20) NOT NULL, -- Status of the action (e.g., Success, Failure). Empty string means "Success"
     PRIMARY KEY (id), -- The primary key is the unique action ID
