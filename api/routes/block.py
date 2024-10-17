@@ -16,7 +16,7 @@ router = APIRouter()
 async def get_blocks_by_timestamp_range(
         start: int,
         end: int,
-        limit: Optional[int] = conf.PAGE_LIMIT,
+        limit: Optional[int] = conf.DEFAULT_PAGE_LIMIT,
         offset: Optional[int] = 0
 ):
     # Convert Unix timestamp (int) to datetime

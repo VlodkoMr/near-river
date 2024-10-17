@@ -1,9 +1,9 @@
 # NEAR River
 
 NEAR River is a robust solution for quickly building and launching custom indexers with API for the NEAR blockchain.
-It offers a user-friendly interface to access any data — whether historical or live, using Substreams for blocks, transactions, and receipts. 
-You can easily customize filters, store the exact data you need in a database, and query through a pre-built, 
-extendable API with integrated AI support. 
+It offers a user-friendly interface to access any data — whether historical or live, using Substreams for blocks, transactions, and receipts.
+You can easily customize filters, store the exact data you need in a database, and query through a pre-built,
+extendable API with integrated AI support.
 
 ### Key Features:
 
@@ -60,7 +60,7 @@ extendable API with integrated AI support.
 
 - `DB_CONNECTION` - Database connection string.
 
-#### Download AI Model:
+#### Download AI Models:
 
 You can use any AI model for this project. In our example, we use "sqlcoder-7b-2" from Hugging Face. To download it, follow these steps:
 
@@ -71,10 +71,13 @@ You can use any AI model for this project. In our example, we use "sqlcoder-7b-2
 huggingface-cli login
 ```
 
-- Download the model to /api/config/ai_models/ directory:
+- Download the models to /api/config/ai_models/ directory:
 
 ```bash
+# Text to SQL model - generate SQL for database requests
 huggingface-cli download defog/sqlcoder-7b-2 --local-dir api/config/ai_models/sqlcoder-7b-2
+# Text to Text model - analize the data and generate the answer for the question
+huggingface-cli download meta-llama/Llama-3.2-1B-Instruct --local-dir api/config/ai_models/Llama-3.2-1B-Instruct
 ```
 
 ## Running the Project
@@ -103,9 +106,27 @@ rm ./substreams/substreams_init.lock
 
 #### Usage
 
-After running docker - substreams will begin collecting data from the NEAR blockchain, using the configurations from your environment settings. 
+After running docker - substreams will begin collecting data from the NEAR blockchain, using the configurations from your environment settings.
 API endpoints will be available for querying the database, all endpoints are documented in the [http://localhost:3000/docs](http://localhost:3000/docs).
-If you run docker with GPU support, you can use the AI-powered API to query the database with AI-generated SQL queries, ask questions about the data, and get insights.
+
+If you run docker with GPU support, you can use the AI-powered API to query the database with AI-generated SQL queries, ask questions about the data, and get insights:
+
+#### AI Usage
+
+To use the AI features, ensure that the API is running with GPU support and that the AI model has been downloaded as described earlier.
+The following AI endpoints are available:
+
+- POST `/api/analytics/sql` - Submit a data-related question, and the AI will generate the most relevant SQL query and return both the query and the resulting data. We use the `sqlcoder-7b-2` model for this task to generate SQL query and request data
+  from the database.
+  > Request: {question: string}
+  > Success response: {question: string, sql: string, data: object[]}
+  > Error response: {question: string, sql: string, error: string}
+- POST `/api/analytics/question` - Ask a general question about the data. The AI will internally use the `/api/analytics/sql` endpoint to retrieve and analyze the data and then process the answer using the `Llama-3.2-1B-Instruct` model.
+  > Request: {sql_question: string, data_question: string}. `sql_question` is used to generate SQL query, `data_question` is used to generate the answer based on the data.
+  > Success response: {question: string, answer: string}
+  > Error response: {question: string, error: string}
+
+Update AI settings in `api/config/settings.py` to customize the model behavior - increase the `AI_SQL_MODEL_NUM_BEAMS` and `AI_SQL_MODEL_MAX_TOKENS` to get better results at the cost of speed and memory.
 
 ### Why Choose NEAR River?
 
@@ -114,6 +135,7 @@ It’s scalable, flexible, and designed to handle any amount of data with real-t
 The pre-built API makes querying easy, and data storage is optimized for reduced size.
 
 API with AI and Event Listeners:
+
 - AI-Powered Data Querying: You can interact with the AI to ask about any data from the NEAR blockchain. The AI will generate the appropriate SQL query and return the most relevant results from your database.
 - Custom Event Listeners: Set up event listeners to trigger calls to NEAR or EVM-compatible chains based on your custom logic, enabling automated workflows.
 

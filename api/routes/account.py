@@ -13,7 +13,7 @@ router = APIRouter()
 @exception_handler
 async def get_near_token_sent(
         signer_id: str,
-        limit: Optional[int] = conf.PAGE_LIMIT,
+        limit: Optional[int] = conf.DEFAULT_PAGE_LIMIT,
         offset: Optional[int] = 0
 ):
     """ Get NEAR token transfers sent by the signer with pagination """
@@ -48,7 +48,7 @@ async def get_near_token_sent(
 @exception_handler
 async def get_near_token_received(
         receiver_id: str,
-        limit: Optional[int] = conf.PAGE_LIMIT,
+        limit: Optional[int] = conf.DEFAULT_PAGE_LIMIT,
         offset: Optional[int] = 0
 ):
     """ Get NEAR token transfers received by the account with pagination """
@@ -83,7 +83,7 @@ async def get_near_token_received(
 @exception_handler
 async def get_ft_transfers_sent(
         signer_id: str,
-        limit: Optional[int] = conf.PAGE_LIMIT,
+        limit: Optional[int] = conf.DEFAULT_PAGE_LIMIT,
         offset: Optional[int] = 0
 ):
     """ Get fungible token transfers sent by the signer with pagination """
@@ -118,7 +118,7 @@ async def get_ft_transfers_sent(
 @exception_handler
 async def get_ft_transfers_received(
         receiver_id: str,
-        limit: Optional[int] = conf.PAGE_LIMIT,
+        limit: Optional[int] = conf.DEFAULT_PAGE_LIMIT,
         offset: Optional[int] = 0
 ):
     """ Get fungible token transfers received by the account with pagination """

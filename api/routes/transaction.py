@@ -54,7 +54,7 @@ async def get_tx_by_block_height(height: int):
 async def get_tx_by_timestamp_range(
         start: int,
         end: int,
-        limit: Optional[int] = conf.PAGE_LIMIT,
+        limit: Optional[int] = conf.DEFAULT_PAGE_LIMIT,
         offset: Optional[int] = 0
 ):
     # Convert Unix timestamp (int) to datetime
@@ -87,7 +87,7 @@ async def get_tx_by_timestamp_range(
 @exception_handler
 async def get_tx_by_signer_id(
         signer_id: str,
-        limit: Optional[int] = conf.PAGE_LIMIT,
+        limit: Optional[int] = conf.DEFAULT_PAGE_LIMIT,
         offset: Optional[int] = 0
 ):
     """ Get transactions sent by the account """
@@ -110,7 +110,7 @@ async def get_tx_by_signer_id(
 @exception_handler
 async def get_tx_by_receiver_id(
         receiver_id: str,
-        limit: Optional[int] = conf.PAGE_LIMIT,
+        limit: Optional[int] = conf.DEFAULT_PAGE_LIMIT,
         offset: Optional[int] = 0
 ):
     """ Get transactions received by the account """
