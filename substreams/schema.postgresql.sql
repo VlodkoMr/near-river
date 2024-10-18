@@ -45,7 +45,7 @@ CREATE TABLE receipt_actions (
     action_kind VARCHAR(20) NOT NULL, -- The type of action (options: FunctionCall, Transfer, Stake, CreateAccount, DeployContract, AddKey, DeleteKey, DeleteAccount, Delegate, Unknown)
     action_index BIGINT NOT NULL, -- The position of the action within the transaction (used when multiple actions are present)
     method_name VARCHAR(255) NOT NULL, -- The name of the method being called for FunctionCall actions.
-    args TEXT, -- JSON-formatted arguments passed to the method (if applicable)
+    args JSON, -- JSON-formatted arguments passed to the method (if applicable)
     social_kind VARCHAR(20), -- Type of social interaction if related to social transactions (options: Post, Comment, Like, Repost, Profile, Poke, Follow, UnFollow, Widget, Notify). This actions related only to the NEAR Social (social.near calls).
     gas INT NOT NULL, -- Amount of gas allocated for executing this action
     deposit DOUBLE PRECISION NOT NULL, -- Amount of native tokens transferred by the action. Native token is NEAR, it is transaction transfer amount

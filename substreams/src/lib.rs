@@ -228,7 +228,7 @@ fn push_action_create(
         .change("receiver_id", (None, &action.receiver_id))
         .change("action_kind", (None, &action.action_kind))
         .change("method_name", (None, &action.method_name))
-        .change("args", (None, &action.args))
+        .change("args", (None, action.args.as_str()))
         .change("social_kind", (None, &action.social_kind))
         .change("status", (None, action.status.to_string()))
         .change("gas", (None, action.gas))

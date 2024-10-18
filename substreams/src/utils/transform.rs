@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use serde_json::json;
 use substreams_near::pb::sf::near::r#type::v1::{Action, ExecutionOutcome, Receipt, SignedTransaction};
 use crate::pb::near::custom::v1::{TransactionMeta, BlockMeta, ReceiptActionMeta};
 use substreams_near::pb::sf::near::r#type::v1::action::Action as ActionTypes;
@@ -37,7 +38,7 @@ pub fn transform_action(
 
     let args = match &action.action {
         Some(ActionTypes::FunctionCall(function_call)) => extract_function_call_args(&function_call.args),
-        _ => "".to_string(),
+        _ => json!(null), // Empty or None if not a FunctionCall
     };
 
     let social_kind = match &action.action {
@@ -77,7 +78,7 @@ pub fn transform_action(
         action_kind: action_kind.to_string(),
         action_index,
         method_name,
-        args,
+        args: args.to_string(),
         social_kind,
         gas,
         deposit,

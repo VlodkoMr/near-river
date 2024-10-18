@@ -4,7 +4,7 @@
 set -a; source ".env"; set +a
 
 # Remove carriage returns from environment variables (for Windows line endings)
-for var in DB_CONNECTION SUBSTREAMS_API_KEY START_BLOCK END_BLOCK MAX_ARGS_LENGTH FILTERED_RECEIVER_IDS FILTERED_METHOD_NAMES; do
+for var in DB_CONNECTION SUBSTREAMS_API_KEY START_BLOCK END_BLOCK FILTERED_RECEIVER_IDS FILTERED_METHOD_NAMES; do
   eval "$var=\"\${$var//$'\r'/}\""
 done
 
@@ -32,7 +32,6 @@ fi
 
 # Generate Rust environment constants
 cat > ./src/env.rs <<EOL
-pub const MAX_ARGS_LENGTH: usize = ${MAX_ARGS_LENGTH};
 pub const FILTERED_RECEIVER_IDS: &[&str] = &[$(if [ -z "$FILTERED_RECEIVER_IDS" ]; then echo ""; else echo "\"${FILTERED_RECEIVER_IDS//,/\", \"}\""; fi)];
 pub const FILTERED_METHOD_NAMES: &[&str] = &[$(if [ -z "$FILTERED_METHOD_NAMES" ]; then echo ""; else echo "\"${FILTERED_METHOD_NAMES//,/\", \"}\""; fi)];
 EOL

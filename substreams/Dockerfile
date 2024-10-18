@@ -3,6 +3,7 @@ FROM rust:1.72-slim
 # Install necessary tools
 RUN apt-get update && apt-get install -y \
     curl \
+    libc6 \
     ca-certificates \
     build-essential \
     make \

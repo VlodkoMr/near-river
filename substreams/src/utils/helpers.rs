@@ -1,9 +1,8 @@
-use serde_json::Value;
+use serde_json::{Value, json};
 use std::string::String;
 use xxhash_rust::xxh3::Xxh3;
 use substreams_near::pb::sf::near::r#type::v1::CryptoHash;
 use crate::pb::near::custom::v1::ReceiptActionMeta;
-use crate::env::MAX_ARGS_LENGTH;
 
 pub fn bytes_to_near_amount(bytes: Vec<u8>) -> f64 {
     let bytes_array: [u8; 16] = bytes.try_into().expect("slice with incorrect length");
@@ -25,18 +24,17 @@ pub fn generate_hash_pk(action: &ReceiptActionMeta) -> u64 {
     hash.digest()
 }
 
-// Extracts the function call arguments from the action and limits the length to MAX_ARGS_LENGTH
-pub fn extract_function_call_args(args: &Vec<u8>) -> String {
+// Extracts the function call arguments from the action
+pub fn extract_function_call_args(args: &Vec<u8>) -> Value {
     let args_str = match std::str::from_utf8(args) {
-        Ok(str) => str.to_string(),
-        Err(_) => "".to_string(),
+        Ok(str) => str,
+        Err(_) => return json!(null), // Return null if it's not valid UTF-8
     };
 
-    if args_str.len() > MAX_ARGS_LENGTH {
-        return "".to_string();
+    match serde_json::from_str(args_str) {
+        Ok(json) => json,
+        Err(_) => json!(args_str),
     }
-
-    args_str
 }
 
 pub fn extract_social_kind(method_name: &str, args: &[u8]) -> String {
