@@ -39,7 +39,7 @@ class AISummaryService:
         prompt_messages = self.generate_summary_prompt(
             question,
             data,
-            "config/ai_data/summary_prompt.md",
+            "config/prompts/summary_prompt.md",
         )
 
         pipe = pipeline(

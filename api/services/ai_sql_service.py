@@ -39,7 +39,7 @@ class AISqlService:
     def run_sql_command(self, question: str):
         prompt = self.generate_sql_prompt(
             question,
-            "config/ai_data/sql_prompt.md",
+            "config/prompts/sql_prompt.md",
             "/schema.postgresql.sql"
         )
         pipe = pipeline(
