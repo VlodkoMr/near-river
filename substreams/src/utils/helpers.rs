@@ -1,4 +1,4 @@
-use serde_json::{Value, json};
+use serde_json::Value;
 use std::string::String;
 use xxhash_rust::xxh3::Xxh3;
 use substreams_near::pb::sf::near::r#type::v1::CryptoHash;
@@ -25,16 +25,13 @@ pub fn generate_hash_pk(action: &ReceiptActionMeta) -> u64 {
 }
 
 // Extracts the function call arguments from the action
-pub fn extract_function_call_args(args: &Vec<u8>) -> Value {
+pub fn extract_function_call_args(args: &Vec<u8>) -> String {
     let args_str = match std::str::from_utf8(args) {
-        Ok(str) => str,
-        Err(_) => return json!(null), // Return null if it's not valid UTF-8
+        Ok(str) => str.to_string(),
+        Err(_) => "".to_string(),
     };
 
-    match serde_json::from_str(args_str) {
-        Ok(json) => json,
-        Err(_) => json!(args_str),
-    }
+    args_str
 }
 
 pub fn extract_social_kind(method_name: &str, args: &[u8]) -> String {
