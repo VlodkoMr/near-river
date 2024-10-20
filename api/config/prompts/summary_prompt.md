@@ -1,6 +1,6 @@
 ### Task
 
-Generate response to answer [QUESTION]{user_question}[/QUESTION] using instructions and provided data in section `Data to Analyse`.
+Generate response to answer user question using instructions and provided data in section `Data to Analyse`.
 Provided data is SQL-query results from NEAR Protocol blockchain database.
 
 ### Instructions
@@ -80,7 +80,3 @@ Specific arguments passed to the method can be found in the "args" column, it us
 ### Data to Analyse
 
 {data}
-
-### Answer
-
-Given the data and instructions, here is the answers [QUESTION]{user_question}[/QUESTION]

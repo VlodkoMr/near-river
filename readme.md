@@ -71,13 +71,10 @@ You can use any AI model for this project. In our example, we use "sqlcoder-7b-2
 huggingface-cli login
 ```
 
-- Download the models to /api/config/ai_models/ directory:
+- Download the model to /api/config/ai_models/ directory:
 
 ```bash
-# Text to SQL model - generate SQL for database requests
-huggingface-cli download defog/sqlcoder-7b-2 --local-dir api/config/ai_models/sqlcoder-7b-2
-# Text to Text model - analize the data and generate the answer for the question
-huggingface-cli download meta-llama/Llama-3.2-1B-Instruct --local-dir api/config/ai_models/Llama-3.2-1B-Instruct
+huggingface-cli download meta-llama/Llama-3.2-3B-Instruct --local-dir api/config/ai_models/Llama-3.2-3B-Instruct
 ```
 
 ## Running the Project
