@@ -8,7 +8,7 @@ Generate one SQL query to answer [QUESTION]{user_question}[/QUESTION]. Return **
 - If you cannot answer the question with the available database schema, return text 'I do not know' as SQL query.
 - The query should be a valid SQL query that can be run on the provided database schema. Check the database schema section for details about the tables and columns.
 - Each time when user ask about transactions, check if "transactions" table is enough to answer the question or you need to look into "receipt_actions" table.
-- The SQL schema represents NEAR Protocol blockchain data: blocks, transactions, and receipt actions (receipt_actions).
+- The SQL schema represents NEAR Protocol blockchain data: blocks, transactions, and receipt actions.
 - The question may contain NEAR blockchain-specific terms, "NEAR Blockchain Overview" section provides an overview of these terms and relations. Use other sections "Fungible Tokens (FT)", "Non-Fungible Tokens (NFT)", "Smart Contract Deployment", "Chain Signatures", "Social Transactions", "Action Kinds and Methods columns" for more details about user requests.
 - Do **not** include any explanations, comments, or additional responses in the answer.
 
@@ -17,8 +17,8 @@ Generate one SQL query to answer [QUESTION]{user_question}[/QUESTION]. Return **
 NEAR Protocol is a layer-1 blockchain with core components:
 
 - Blocks: Represented in the "blocks" table, each block has metadata like block number ("block_height"), timestamp ("block_timestamp"), block_hash, producer ("author_account_id") and count of approvals ("approvals").
-- Transactions: Represented in the "transactions" table, transactions belong to blocks and contain information like the sender ("signer_id"), receiver("receiver_id"), and transaction hash ("tx_hash"). Transactions have associated receipts in the "
-  receipt_actions" table that contain detailed information about the actions performed in the transaction, deposits, staking and other information.
+- Transactions: Represented in the "transactions" table, transactions belong to blocks and contain information like the sender ("signer_id"), receiver("receiver_id"), and transaction hash ("tx_hash"). Transactions have associated receipts in the 
+  "receipt_actions" table that contain detailed information about the actions performed in the transaction, deposits, staking and other information.
 - Receipt Actions: Represented in the "receipt_actions" table, it capture the detailed execution of smart-contracts, action kind, deposits, methods, social activity and call arguments. Each receipt is belongs to transaction by the "transaction_hash" field.
 
 #### Fungible Tokens (FT)
@@ -53,7 +53,7 @@ More details about chain signature-related actions can be found in the "receipt_
 #### Social Transactions
 
 NEAR blockchain also supports NEAR Social - a decentralized social media platform.
-Actions related to social transactions can be found in the receipt_actions table.
+Actions related to social transactions can be found in the "receipt_actions" table.
 These actions are identified by the "social_kind" column, with potential values like:
 `Post`, `Comment`, `Like`, `Repost`, `Profile`, `Poke`, `Follow`, `UnFollow`, `Widget`, `Notify`.
 

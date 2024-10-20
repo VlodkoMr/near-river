@@ -1,81 +1,55 @@
 ### Task
 
-Generate response to answer user question using instructions and provided data in section `Data to Analyse`.
-Provided data is SQL-query results from NEAR Protocol blockchain database.
+Generate a response to answer the user’s question by using the instructions and the provided data in the `Data to Analyze` section. 
+The data represents the result of data from the NEAR Protocol blockchain database.
 
 ### Instructions
 
-The question related NEAR blockchain-specific terms, especially related to blockchain transactions, receipts, accounts, tokens, contracts, and methods.
-"NEAR Blockchain Overview" section provides an overview of these terms and relations.
+- The question relay on NEAR blockchain-specific terms, particularly can include blockchain transactions, receipts, accounts, tokens, smart-contracts, and called methods or arguments. 
+- The answer can include a detailed analysis of patterns, insights, or summaries based on the user's query.
+- Do not repeat user request, include only the answer to the user's question. Do not tell that information related to NEAR blockchain, user already knows that, provide only the answer to the user's question.
+- Do not describe data structures or blockchain related terms, the user is already familiar with them - main focus on the answer to the user's question based on provided data.
+- The `NEAR Blockchain Overview` section outlines relevant terms and relationships. Use it as a reference to generate accurate answers.
+- The `Token Transactions`, `Smart Contract`, `Cross-Chain Transactions`, `Social Transactions` sections describe specific transaction types and their attributes.
 
-##### NEAR Blockchain Overview
+#### NEAR Blockchain Overview
 
-NEAR Protocol is a layer-1 blockchain with core components:
+NEAR Protocol is a layer-1 blockchain. Key components include:
 
-- Blocks: Represented in the "blocks" table, each block has metadata like block number ("block_height"), timestamp ("block_timestamp"), block_hash, producer ("author_account_id") and count of approvals ("approvals").
-- Transactions: Represented in the "transactions" table, transactions belong to blocks and contain information like the sender ("signer_id"), receiver("receiver_id"), and transaction hash ("tx_hash"). Transactions have associated receipts in the "
-  receipt_actions" table that contain detailed information about the actions performed in the transaction, deposits, staking and other information.
-- Receipt Actions: Represented in the "receipt_actions" table, it capture the detailed execution of smart-contracts, action kind, deposits, methods, social activity and call arguments. Each receipt is belongs to transaction by the "transaction_hash"
-  field.
+- Blocks: Captured in the "blocks" table.
+- Transactions: Stored in the "transactions" table.
+- Receipt Actions: Found in the "receipt_actions" table.
 
-##### Fungible Tokens (FT)
+More details about each component described in the "Database Schema" section.
 
-Standard: NEP-141, NEP-148
-These methods are recorded in the "receipt_actions" table, within the "method_name" column. Each method’s arguments are stored in JSON format in the "args" column.
+#### Token Transactions
 
-Column "method_name" for FT can include:`create_token` (Creates a new FT),`storage_deposit` (Registers a user account/wallet for owning and transferring tokens), `ft_transfer` (Transfers FT to another account), `ft_transfer_call` (Similar to
-ft_transfer, but
-also calls a method on the receiving contract), `storage_withdraw` (Unregisters a user account/wallet from holding a particular token).
+Fungible Tokens (FT) actions follow NEP-141 or NEP-148 standards and are recorded in the "receipt_actions" table:
 
-Column "predecessor_id" refers to the sender and "receiver_id" refers to the recipient.
+Common methods include "ft_transfer", "ft_transfer_call", and "storage_deposit".
+The args column contains information like the "recipient account" and "amount" (referring to the FT amount).
+For Non-Fungible Tokens (NFTs), actions follow NEP-171 and NEP-177 standards and include methods like "nft_transfer", "nft_mint", and "nft_approve".
 
-#### Non-Fungible Tokens (NFT)
+#### Smart Contract
 
-Standard: NEP-171, NEP-177
-These methods are also recorded in the "receipt_actions" table under the "method_name" column.
-Each method’s arguments are stored in JSON format in the "args" column.
+Smart contracts are deployed and managed via FunctionCall actions, captured in the receipt_actions table. 
+Smart contract details (e.g., code hash, initialization parameters) are available in the args column.
 
-Column "method_name" for NFT can include:`nft_mint`: (Mints a new NFT),`nft_transfer` (Transfers NFT ownership to another account), `nft_transfer_call` (Transfers an NFT and invokes a method on the receiver contract), `nft_approve` (Approves the
-transfer of
-an NFT.
-Column "predecessor_id" refers to the sender and "receiver_id" refers to the recipient.
+#### Cross-Chain Transactions
 
-#### Smart Contract Deployment
-
-Smart contracts are deployed using the deploy method in the "receipt_actions" table.
-The "args" column contains details about the deployment in JSON format, including:
-
-- `code_hash`: The hash of the contract code being deployed.
-- `storage_deposit`: The amount of storage allocated for the contract.
-- `init`: Initialization parameters for the smart contract.
-
-#### Chain Signatures (Multi-chain Transactions)
-
-NEAR supports cross-chain transactions via chain signatures.
-Such transactions can be identified in the transactions table when the "receiver_id" column contains `v1.signer`.
-More details about chain signature-related actions can be found in the "receipt_actions" table by filtering with "receiver_id" for relevant accounts.
+- Cross-chain activity can be identified using specific receiver accounts like v1.signer in the transactions table.
 
 #### Social Transactions
 
 NEAR blockchain also supports NEAR Social - a decentralized social media platform.
-Actions related to social transactions can be found in the receipt_actions table.
+Actions related to social transactions can be found in the `receipt_actions` table.
 These actions are identified by the "social_kind" column, with potential values like:
-`Post`, `Comment`, `Like`, `Repost`, `Profile`, `Poke`, `Follow`, `UnFollow`, `Widget`, `Notify`.
 
-#### Action Kinds and Methods columns
+### Database Schema
 
-Receipt actions "receipt_actions" table, "action_kind" column include various methods for different on-chain activities, including:
+The query will run on a database with the following schema:
 
-- Contract Calls: `FunctionCall` (calling a method on a smart-contract)
-- Account management: `CreateAccount`, `DeleteAccount`
-- Key management: `AddKey`, `DeleteKey`
-- Staking: `Stake` (NEAR native staking)
-- Delegation: `Delegate` (delegating actions to another account)
-- NEAR token transfers: `Transfer` (only for native NEAR token)
-- Deploying a smart-contract: `DeployContract` (deploying a new smart contract)
-
-Each action type can be identified using the "action_kind", and "method_name" column contain the specific method called within the action.
-Specific arguments passed to the method can be found in the "args" column, it use JSON format.
+{table_metadata}
 
 ### Data to Analyse
 
