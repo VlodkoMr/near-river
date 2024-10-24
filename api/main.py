@@ -1,6 +1,8 @@
+import os
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Security
+from fastapi.security.api_key import APIKeyHeader
 
 from routes import block, transaction, account, analytics
 from services.database_service import DatabaseService
@@ -14,16 +16,25 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="NEAR River API")
 
+API_SECRET_KEY = os.getenv("API_SECRET_KEY")
+api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
 
-@app.get("/")
+async def api_key_check(api_key: str = Security(api_key_header)):
+    if API_SECRET_KEY and api_key == API_SECRET_KEY:
+        return True
+    elif not API_SECRET_KEY:  # No API key set, allow public access
+        return True
+    raise HTTPException(status_code=403, detail="Forbidden: Invalid API Key")
+
+@app.get("/", dependencies=[Depends(api_key_check)])
 async def root():
     return {"message": "Welcome! Visit /docs for the API documentation."}
 
 
-app.include_router(block.router, prefix="/block", tags=["blocks"])
-app.include_router(transaction.router, prefix="/transaction", tags=["transactions"])
-app.include_router(account.router, prefix="/account", tags=["accounts"])
-app.include_router(analytics.router, prefix="/analytic", tags=["analytics"])
+app.include_router(block.router, prefix="/block", dependencies=[Depends(api_key_check)], tags=["blocks"])
+app.include_router(transaction.router, prefix="/transaction", dependencies=[Depends(api_key_check)], tags=["transactions"])
+app.include_router(account.router, prefix="/account", dependencies=[Depends(api_key_check)], tags=["accounts"])
+app.include_router(analytics.router, prefix="/analytic", dependencies=[Depends(api_key_check)], tags=["analytics"])
 
 
 # ------------------------ Start/Stop process ------------------------
