@@ -15,6 +15,7 @@ extendable API with integrated AI support.
 - **NEAR Social Integration:** Parse `social.near` events for enhanced search and filtering capabilities.
 - **AI-Powered Analytics:** Gain valuable insights and data analytics directly from your setup with integrated AI.
 - **No External API Usage for AI:** Enjoy unlimited AI queries without rate or data limits, and no extra costs — the AI runs on your own machine!
+- **User-defined Event Subscriptions:** Define specific conditions or events to listen for and push these updates through a HTTP or smart-contract, providing real-time, filtered data streams.
 
 ### Comparison with Existing NEAR Indexer/API Solutions:
 
@@ -51,14 +52,18 @@ extendable API with integrated AI support.
 - `DB_CONNECTION` - Database connection string.
 - `START_BLOCK` - The starting block for the indexer. Use "latest" to start from the latest block at launch.
 - `END_BLOCK` - The ending block for the indexer. Leave it empty to track all blocks, or set a block number to stop processing before that block.
-- `FILTERED_RECEIVER_IDS` - A comma-separated list of transaction receivers (smart-contract that user call or tx recipient) to filter transactions and receipts.
-  Empty string to process all transactions.
-- `FILTERED_METHOD_NAMES` - A comma-separated list of method names to filter receipts. Empty string to process all receipts.
-- `MAX_ARGS_LENGTH` - The maximum length of the arguments string to store in the database. This helps save disk space by limiting the argument string length.
+- `FILTERED_RECEIVER_IDS` - A comma-separated list of transaction receivers (smart-contract that user call or tx recipient) to filter transactions and receipts. Empty string to process all transactions.
+- `FILTERED_METHOD_NAMES` - A comma-separated list of method names to filter receipts. Empty string to store all calls (filter disabled).
 
 ### API environment (api/.env file)
 
 - `DB_CONNECTION` - Database connection string.
+- `API_SECRET_KEY` - API secret key for authentication. Empty string to make the API public.
+- `ENABLE_EVENT_LISTENER` - true or false to enable or disable event listeners.
+- `EVENT_FILTER_SENDER` - Filter events by sender account ID. Empty string to process all events. In most cases you will need complex rules or logic, this is just for example, customise event listeners in `api/event_subscription_service.py`.
+- `EVENT_FILTER_RECIPIENT` - Filter events by recipient account ID. Empty string to process all events.
+- `EVENT_NOTIFICATION_TARGET` - Call smart-contract or make http request. For smart-contract use format "some-contract.near|method_name". For HTTP call provide URL and method like "https://website.com|POST".
+- `EVENT_NOTIFICATION_ACCOUNT` - NEAR Account private key for event notifications. Required for smart-contract calls.
 
 #### Download AI Models:
 
@@ -123,7 +128,7 @@ The following AI endpoints are available:
   > Success response: {question: string, answer: string}
   > Error response: {question: string, error: string}
 
-Update AI settings in `api/config/settings.py` to customize the model behavior - increase the `AI_SQL_MODEL_NUM_BEAMS` and `AI_SQL_MODEL_MAX_TOKENS` to get better results at the cost of speed and memory.
+Update AI and app settings in `api/config/settings.py` to customize the model behavior - increase the `AI_SQL_NUM_BEAMS` and `AI_SQL_MAX_TOKENS` to get better results at the cost of speed and memory.
 
 ### Why Choose NEAR River?
 
@@ -138,4 +143,6 @@ API with AI and Event Listeners:
 
 ## TODO
 
-- Add address mask filters to extend filtering capabilities.
+- Add filter masks to extend filtering capabilities.
+- Update `receipt_actions`.`args` field to JSON for better data filtering and querying.
+- AI-driven Alerts and Analytics: Leverage the integrated AI to not only query data but also to provide predictive insights and alert users about unusual patterns, such as suspicious transaction volumes or unexpected contract behaviors.

@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS blocks;
 DROP TABLE IF EXISTS cursors;
 DROP TABLE IF EXISTS substreams_history;
-DROP TABLE IF EXISTS api_queries;
+DROP TABLE IF EXISTS event_sync_progress;
 
 CREATE TABLE blocks (
     block_height BIGINT UNIQUE NOT NULL, -- Block height
@@ -43,9 +43,9 @@ CREATE TABLE receipt_actions (
     predecessor_id VARCHAR(64) NOT NULL, -- Wallet address (user) or smart-contract address of the transaction's sender (signer or predecessor)
     receiver_id VARCHAR(64) NOT NULL, -- Wallet address (user) or smart-contract address of the transaction's receiver (recipient)
     action_kind VARCHAR(20) NOT NULL, -- The type of action (options: FunctionCall, Transfer, Stake, CreateAccount, DeployContract, AddKey, DeleteKey, DeleteAccount, Delegate, Unknown)
-    action_index BIGINT NOT NULL, -- The position of the action within the transaction (used when multiple actions are present)
+    action_index BIGINT NOT NULL, -- Not used in queries, internal index
     method_name VARCHAR(255) NOT NULL, -- The name of the method being called for FunctionCall actions.
-    args TEXT, -- JSON-formatted arguments passed to the method (if applicable)
+    args TEXT, -- Function call arguments passed to the smart-contract method (if applicable)
     social_kind VARCHAR(20), -- Type of social interaction if related to social transactions (options: Post, Comment, Like, Repost, Profile, Poke, Follow, UnFollow, Widget, Notify). This actions related only to the NEAR Social (social.near calls).
     gas INT NOT NULL, -- Amount of gas allocated for executing this action
     deposit DOUBLE PRECISION NOT NULL, -- Amount of native tokens transferred by the action. Native token is NEAR, it is transaction transfer amount
@@ -60,3 +60,11 @@ CREATE INDEX idx_receipt_actions_predecessor_id ON receipt_actions(predecessor_i
 CREATE INDEX idx_receipt_actions_receiver_id ON receipt_actions(receiver_id);
 CREATE INDEX idx_receipt_actions_method_name ON receipt_actions(method_name);
 CREATE INDEX idx_receipt_actions_predecessor_receiver ON receipt_actions(predecessor_id, receiver_id);
+
+
+CREATE TABLE event_subscription_progress (
+    init_block_height BIGINT NOT NULL, -- Initial block height for event sync
+    last_block_height BIGINT NOT NULL, -- Last block height processed for this stream
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL, -- Timestamp of the last update
+);
+
