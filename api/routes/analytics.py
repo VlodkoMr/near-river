@@ -1,3 +1,4 @@
+import torch
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from services.database_service import DatabaseService
@@ -63,6 +64,8 @@ async def get_analytics_question(request: SummaryQuestionRequest):
         # Use the AI service to generate SQL query based on the question
         result_sql = ai_model_service.run_sql_command(sql_question)
         print('Result SQL: ', result_sql)
+
+        torch.cuda.empty_cache()
 
         # Try to execute generated SQL query and return the result
         async with DatabaseService() as db:
