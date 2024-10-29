@@ -67,7 +67,7 @@ extendable API with integrated AI support.
 
 #### Download AI Models:
 
-You can use any AI model for this project. In our example, we use "sqlcoder-7b-2" from Hugging Face. To download it, follow these steps:
+You can use any AI model for this project. In our example, we use "Llama-3.2-3B-Instruct" from Hugging Face. To download it, follow these steps:
 
 - Install the Hugging Face CLI: https://huggingface.co/docs/huggingface_hub/guides/cli
 - Log in to your Hugging Face account:
@@ -140,6 +140,12 @@ API with AI and Event Listeners:
 
 - AI-Powered Data Querying: You can interact with the AI to ask about any data from the NEAR blockchain. The AI will generate the appropriate SQL query and return the most relevant results from your database.
 - Custom Event Listeners: Set up event listeners to trigger calls to NEAR or EVM-compatible chains based on your custom logic, enabling automated workflows.
+
+# Future updates and self-sufficiency
+
+We build NEAR River to be a self-sufficient, open-source solution that you can customize and extend to meet your unique needs. 
+In other side we can provide unique use-cases and customizations by request, add data aggregation, and AI-driven analytics, insights as part of our services (like Pikespeak).
+Any ecosystem project or even NEAR foundation can request custom features and integrations, and we will be happy to help.
 
 ## TODO
 

@@ -3,7 +3,8 @@ DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS blocks;
 DROP TABLE IF EXISTS cursors;
 DROP TABLE IF EXISTS substreams_history;
-DROP TABLE IF EXISTS event_sync_progress;
+DROP TABLE IF EXISTS event_progress;
+
 
 CREATE TABLE blocks (
     block_height BIGINT UNIQUE NOT NULL, -- Block height
@@ -13,8 +14,8 @@ CREATE TABLE blocks (
     approvals BIGINT, -- Number of approvals (signatures) from validators for this block
     PRIMARY KEY (block_height) -- The primary key is the block height, ensuring uniqueness and fast lookup
 );
-
 CREATE INDEX idx_blocks_block_timestamp ON blocks(block_timestamp);
+
 
 CREATE TABLE transactions (
     block_height BIGINT NOT NULL, -- Block height to which the transaction belongs (linked to blocks table)
@@ -27,7 +28,6 @@ CREATE TABLE transactions (
     PRIMARY KEY (tx_hash), -- The primary key is the transaction hash, ensuring unique identification of each transaction
     FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE -- Foreign key linking to the block
 );
-
 CREATE INDEX idx_transactions_block_timestamp ON transactions(block_timestamp);
 CREATE INDEX idx_transactions_signer_id ON transactions(signer_id);
 CREATE INDEX idx_transactions_receiver_id ON transactions(receiver_id);
@@ -54,7 +54,6 @@ CREATE TABLE receipt_actions (
     PRIMARY KEY (id), -- The primary key is the unique action ID
     FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE -- Foreign key linking to the block
 );
-
 CREATE INDEX idx_receipt_actions_block_timestamp ON receipt_actions(block_timestamp);
 CREATE INDEX idx_receipt_actions_predecessor_id ON receipt_actions(predecessor_id);
 CREATE INDEX idx_receipt_actions_receiver_id ON receipt_actions(receiver_id);
@@ -62,9 +61,10 @@ CREATE INDEX idx_receipt_actions_method_name ON receipt_actions(method_name);
 CREATE INDEX idx_receipt_actions_predecessor_receiver ON receipt_actions(predecessor_id, receiver_id);
 
 
-CREATE TABLE event_subscription_progress (
-    init_block_height BIGINT NOT NULL, -- Initial block height for event sync
-    last_block_height BIGINT NOT NULL, -- Last block height processed for this stream
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL, -- Timestamp of the last update
+CREATE TABLE event_progress (
+    id SERIAL PRIMARY KEY,
+    init_block_height BIGINT NOT NULL, -- Initial block height for events processing
+    last_block_height BIGINT NOT NULL, -- Last block height processed
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() -- Timestamp of the last update
 );
 

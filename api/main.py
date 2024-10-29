@@ -7,7 +7,7 @@ from config.settings import conf
 from helpers.middlewares import api_key_check
 from routes import block, transaction, account, analytics
 from services.database_service import DatabaseService
-from services.event_subscription_service import EventSubscriptionService
+from services.event_service import EventService
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,8 +49,6 @@ app.include_router(
 
 @app.on_event("startup")
 async def startup_event():
-    await DatabaseService.initialize()
-
     # Start event listeners as a background task
     if conf.ENABLE_EVENT_LISTENER:
         asyncio.create_task(start_event_listener_process())
@@ -58,16 +56,9 @@ async def startup_event():
     else:
         logger.info("Event listener is disabled.")
 
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    # Close database connections
-    await DatabaseService.shutdown()
-    logger.info("Database connections closed.")
-
 # ------------------- Background tasks - Events Listener -------------------
 
 async def start_event_listener_process():
     # Check every 10 seconds for new transactions and receipt actions
-    event_listener = EventSubscriptionService(check_interval=10)
+    event_listener = EventService(check_interval=10)
     await event_listener.start_listeners()
