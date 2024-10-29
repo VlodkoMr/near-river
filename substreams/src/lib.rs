@@ -223,7 +223,6 @@ fn push_action_create(
         .change("block_timestamp", (None, action.block_timestamp))
         .change("block_height", (None, action.block_height))
         .change("receipt_id", (None, &action.receipt_id))
-        .change("action_index", (None, action.action_index))
         .change("predecessor_id", (None, &action.predecessor_id))
         .change("receiver_id", (None, &action.receiver_id))
         .change("action_kind", (None, &action.action_kind))

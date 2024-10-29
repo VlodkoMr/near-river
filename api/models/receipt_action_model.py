@@ -11,7 +11,6 @@ class ReceiptActionModel(Model):
     predecessor_id = fields.CharField(max_length=64)
     receiver_id = fields.CharField(max_length=64)
     action_kind = fields.CharField(max_length=20)
-    action_index = fields.BigIntField()
     method_name = fields.CharField(max_length=255)
     args = fields.TextField(null=True)
     social_kind = fields.CharField(max_length=20, null=True)

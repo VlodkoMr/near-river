@@ -43,7 +43,6 @@ CREATE TABLE receipt_actions (
     predecessor_id VARCHAR(64) NOT NULL, -- Wallet address (user) or smart-contract address of the transaction's sender (signer or predecessor)
     receiver_id VARCHAR(64) NOT NULL, -- Wallet address (user) or smart-contract address of the transaction's receiver (recipient)
     action_kind VARCHAR(20) NOT NULL, -- The type of action (options: FunctionCall, Transfer, Stake, CreateAccount, DeployContract, AddKey, DeleteKey, DeleteAccount, Delegate, Unknown)
-    action_index BIGINT NOT NULL, -- Not used in queries, internal index
     method_name VARCHAR(255) NOT NULL, -- The name of the method being called for FunctionCall actions.
     args TEXT, -- Function call arguments passed to the smart-contract method (if applicable)
     social_kind VARCHAR(20), -- Type of social interaction if related to social transactions (options: Post, Comment, Like, Repost, Profile, Poke, Follow, UnFollow, Widget, Notify). This actions related only to the NEAR Social (social.near calls).
