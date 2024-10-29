@@ -44,7 +44,7 @@ class AIModelService:
         if not torch.cuda.is_available():
             raise Exception("GPU is not available. AI requires GPU to process the request.")
 
-        prompt = self.generate_sql_prompt(question,"config/prompts/sql_prompt.md")
+        prompt = self.generate_sql_prompt(question, "config/prompts/sql_prompt.md")
         pipe = pipeline(
             "text-generation",
             model=self.model,

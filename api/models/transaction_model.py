@@ -18,3 +18,17 @@ class TransactionModel(Model):
             ["signer_id"],
             ["receiver_id"]
         ]
+
+    def __str__(self):
+        return self.tx_hash
+
+    def serialize(self):
+        return {
+            "tx_hash": self.tx_hash,
+            "block_height": self.block_height,
+            "block_timestamp": int(self.block_timestamp.timestamp()),
+            "signer_id": self.signer_id,
+            "nonce": self.nonce,
+            "receipt_id": self.receipt_id,
+            "receiver_id": self.receiver_id
+        }

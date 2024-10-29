@@ -1,0 +1,22 @@
+[package]
+name = "near_river_example"
+version = "0.0.1"
+authors = ["Vlodkow <vlodkow@gmail.com>"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+near-sdk = "5.0.0"
+serde_json = { version = "1.0" }
+serde = "1.0.196"
+uint = { version = "0.10.0", default-features = false }
+
+[profile.release]
+codegen-units = 1
+opt-level = "s"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true

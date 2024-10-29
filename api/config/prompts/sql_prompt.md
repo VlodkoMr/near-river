@@ -15,6 +15,7 @@ Return **only** the SQL query without any additional text, symbols, comments, or
 - Do **not** overcomplicate the query and do not generate samples, all SQL queries should be ready to run on the provided database schema. 
 - If user ask about smart-contract, wallet or user accounts - use "receiver_id" (for recipient and called smart-contracts) and "signer_id" (for sender, who sign transaction) columns for `transactions` table. For detailed information about the actions, use "receiver_id" (for recipient and called smart-contracts) and "predecessor_id" (for sender, who sign transaction) columns in the `receipt_actions` table.
 - Final result should be as simple as possible, based on user request. 
+- Use comments in the "Database Schema" section to understand each table and column in the database schema.
 
 #### NEAR Blockchain Overview
 
@@ -80,7 +81,7 @@ CREATE TABLE blocks (
     block_hash TEXT NOT NULL UNIQUE, -- Unique hash of the block used for block identification
     author_account_id VARCHAR(64) NOT NULL, -- Account ID of the block producer (validator)
     approvals BIGINT, -- Number of approvals (signatures) from validators for this block
-    PRIMARY KEY (block_height) -- The primary key is the block height, ensuring uniqueness and fast lookup
+    PRIMARY KEY (block_height)
 );
 
 
@@ -93,11 +94,10 @@ CREATE TABLE transactions (
     receipt_id TEXT, -- Receipt ID linked to the executions of this transaction, belongs to receipt_id column in receipt_actions table
     receiver_id VARCHAR(64), -- Wallet address (user) or smart-contract address of the transaction's receiver, it is account or smart-contract that receive transaction
     PRIMARY KEY (tx_hash), -- The primary key is the transaction hash, ensuring unique identification of each transaction
-    FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE -- Foreign key linking to the block
+    FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE
 );
 
 CREATE TABLE receipt_actions (
-    id TEXT UNIQUE NOT NULL, -- Unique internal action ID, not exposed publicly and not used in queries
     block_height BIGINT NOT NULL, -- Block height associated with this action, part of the block
     block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL, -- Timestamp when this action occurred, matching the block and transaction timestamps
     tx_hash TEXT NOT NULL, -- Transaction hash used to identify the transaction, each receipt action related to the transaction
@@ -113,7 +113,7 @@ CREATE TABLE receipt_actions (
     stake DOUBLE PRECISION NOT NULL, -- Amount of tokens staked, if this is a staking action
     status VARCHAR(20) NOT NULL, -- Status of the action (e.g., Success, Failure). Empty string means "Success"
     PRIMARY KEY (id), -- The primary key is the unique action ID
-    FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE -- Foreign key linking to the block
+    FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE
 );
 ```
 
