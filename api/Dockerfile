@@ -4,18 +4,19 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
-    python3.12 \
-    python3.12-venv \
-    python3-pip \
+    software-properties-common \
+    git \
     cmake \
     build-essential \
     pkg-config \
     libgoogle-perftools-dev \
     gfortran \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y python3.11 python3.11-venv python3.11-distutils python3.11-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /venv
-RUN python3 -m venv venv
+RUN python3.11 -m venv venv
 
 WORKDIR /app
 ENV PATH="/venv/venv/bin:$PATH"

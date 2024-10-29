@@ -12,8 +12,9 @@ Return **only** the SQL query without any additional text, symbols, comments, or
 - The question may contain NEAR blockchain-specific terms, "NEAR Blockchain Overview" section provides an overview of these terms and relations. Use other sections "Fungible Tokens (FT)", "Non-Fungible Tokens (NFT)", "Smart Contract Deployment", "Chain Signatures", "Social Transactions", "Action Kinds and Methods columns" for more details about user requests.
 - Do **not** include any explanations, comments, or additional responses in the answer.
 - Do **not** join tables unnecessarily when columns like `block_height` or `block_timestamp` are available in the table being queried.
+- Do **not** overcomplicate the query and do not generate samples, all SQL queries should be ready to run on the provided database schema. 
 - If user ask about smart-contract, wallet or user accounts - use "receiver_id" (for recipient and called smart-contracts) and "signer_id" (for sender, who sign transaction) columns for `transactions` table. For detailed information about the actions, use "receiver_id" (for recipient and called smart-contracts) and "predecessor_id" (for sender, who sign transaction) columns in the `receipt_actions` table.
-- Final result should be as simple as possible, based on user request. Do not overcomplicate the query.
+- Final result should be as simple as possible, based on user request. 
 
 #### NEAR Blockchain Overview
 
