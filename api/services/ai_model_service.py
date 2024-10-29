@@ -44,11 +44,7 @@ class AIModelService:
         if not torch.cuda.is_available():
             raise Exception("GPU is not available. AI requires GPU to process the request.")
 
-        prompt = self.generate_sql_prompt(
-            question,
-            "config/prompts/sql_prompt.md",
-            "/schema.postgresql.sql"
-        )
+        prompt = self.generate_sql_prompt(question,"config/prompts/sql_prompt.md")
         pipe = pipeline(
             "text-generation",
             model=self.model,
@@ -108,12 +104,9 @@ class AIModelService:
 
         return sql_query
 
-    def generate_sql_prompt(self, question: str, prompt_file: str, metadata_file: str):
-        with open(prompt_file, "r") as prompt_f, open(metadata_file, "r") as meta_f:
-            prompt = prompt_f.read().format(
-                user_question=question,
-                table_metadata_string=meta_f.read()
-            )
+    def generate_sql_prompt(self, question: str, prompt_file: str):
+        with open(prompt_file, "r") as prompt_f:
+            prompt = prompt_f.read().format(user_question=question)
         return prompt
 
     # ------------------------ DATA SUMMARY -------------------------------
