@@ -59,11 +59,12 @@ extendable API with integrated AI support.
 
 - `DB_CONNECTION` - Database connection string.
 - `API_SECRET_KEY` - API secret key for authentication. Empty string to make the API public.
-- `ENABLE_EVENT_LISTENER` - true or false to enable or disable event listeners.
+- `EVENT_BATCH_BLOCKS_COUNT` - how much blocks process in one batch, set "0" to disable event listeners.
 - `EVENT_FILTER_SENDER` - Filter events by sender account ID. Empty string to process all events. In most cases you will need complex rules or logic, this is just for example, customise event listeners in `api/event_subscription_service.py`.
 - `EVENT_FILTER_RECIPIENT` - Filter events by recipient account ID. Empty string to process all events.
-- `EVENT_NOTIFICATION_TARGET` - Call smart-contract or make http request. For smart-contract use format "some-contract.near|method_name". For HTTP call provide URL and method like "https://website.com|POST".
-- `EVENT_NOTIFICATION_ACCOUNT` - NEAR Account private key for event notifications. Required for smart-contract calls.
+- `EVENT_NOTIFICATION_TARGET` - Call smart-contract or make http request. For smart-contract use format "some-contract.near|method_name". For HTTP call provide URL like "https://website.com/some_url", it will be called using POST method.
+- `EVENT_NEAR_ACCOUNT_ID` - NEAR Account address for event notifications. Required for smart-contract calls.
+- `EVENT_NEAR_ACCOUNT_PRIVATE_KEY` - NEAR Account private key for event notifications. Required for smart-contract calls.
 
 #### Download AI Models:
 
@@ -118,12 +119,15 @@ If you run docker with GPU support, you can use the AI-powered API to query the 
 To use the AI features, ensure that the API is running with GPU support and that the AI model has been downloaded as described earlier.
 The following AI endpoints are available:
 
-- POST `/api/analytics/sql` - Submit a data-related question, and the AI will generate the most relevant SQL query and return both the query and the resulting data. We use the `sqlcoder-7b-2` model for this task to generate SQL query and request data
-  from the database.
+- POST `/api/analytics/sql-generate` - Submit a data-related question, and the AI will generate the most relevant SQL query for your request.
   > Request: {question: string}
-  > Success response: {question: string, sql: string, data: object[]}
+  > Success response: {question: string, sql: string}
   > Error response: {question: string, sql: string, error: string}
-- POST `/api/analytics/question` - Ask a general question about the data. The AI will internally use the `/api/analytics/sql` endpoint to retrieve and analyze the data and then process the answer using the `Llama-3.2-1B-Instruct` model.
+- POST `/api/analytics/sql-data` - Submit a SQL query to get data from the database.
+  > Request: {sql: string}
+  > Success response: {sql: string, data: object[]}
+  > Error response: {sql: string, error: string}
+- POST `/api/analytics/question` - Ask a general question about the data. The AI will internally use the `/api/analytics/sql-generate` endpoint to retrieve, analyze the data and then process the answer using the `Llama-3.2-1B-Instruct` model.
   > Request: {sql_question: string, data_question: string}. `sql_question` is used to generate SQL query, `data_question` is used to generate the answer based on the data.
   > Success response: {question: string, answer: string}
   > Error response: {question: string, error: string}
@@ -140,12 +144,6 @@ API with AI and Event Listeners:
 
 - AI-Powered Data Querying: You can interact with the AI to ask about any data from the NEAR blockchain. The AI will generate the appropriate SQL query and return the most relevant results from your database.
 - Custom Event Listeners: Set up event listeners to trigger calls to NEAR or EVM-compatible chains based on your custom logic, enabling automated workflows.
-
-# Future updates and self-sufficiency
-
-We build NEAR River to be a self-sufficient, open-source solution that you can customize and extend to meet your unique needs. 
-In other side we can provide unique use-cases and customizations by request, add data aggregation, and AI-driven analytics, insights as part of our services (like Pikespeak).
-Any ecosystem project or even NEAR foundation can request custom features and integrations, and we will be happy to help.
 
 ## TODO
 

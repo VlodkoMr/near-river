@@ -1,6 +1,6 @@
 ### Task
 
-Generate one SQL query to answer [QUESTION]{user_question}[/QUESTION]. 
+Generate one SQL query to answer [QUESTION]{user_question}[/QUESTION].
 Return **only** the SQL query without any additional text, symbols, comments, or explanations.
 
 ### Instructions
@@ -8,28 +8,33 @@ Return **only** the SQL query without any additional text, symbols, comments, or
 - Generate only read-only SQL queries, ignore any write operations and DDL commands, don't allow any data modification like UPDATE, DELETE, DROP etc, in this case return 'Not allowed'.
 - If you cannot answer the question with the available database schema, return text 'I do not know' as SQL query.
 - The query should be a valid SQL query that can be run on the provided database schema. Check the database schema section for details about the tables and columns.
-- Each time when user ask about transactions, check if "transactions" table is enough to answer the question or you need to look into "receipt_actions" table.
-- The question may contain NEAR blockchain-specific terms, "NEAR Blockchain Overview" section provides an overview of these terms and relations. Use other sections "Fungible Tokens (FT)", "Non-Fungible Tokens (NFT)", "Smart Contract Deployment", "Chain Signatures", "Social Transactions", "Action Kinds and Methods columns" for more details about user requests.
+- Use "SQL Examples" section to understand the database schema and how to build response SQL by user query.
+- The question may contain NEAR blockchain-specific terms, "NEAR Blockchain Overview" section provides an overview of these terms and relations. Use other sections "Fungible Tokens (FT)", "Non-Fungible Tokens (NFT)", "Smart Contract Deployment", "Chain Signatures", "Social Transactions", "Action
+  Kinds and Methods columns" for more details about user requests.
 - Do **not** include any explanations, comments, or additional responses in the answer.
-- Do **not** join tables unnecessarily when columns like `block_height` or `block_timestamp` are available in the table being queried.
-- Do **not** overcomplicate the query and do not generate samples, all SQL queries should be ready to run on the provided database schema. 
-- If user ask about smart-contract, wallet or user accounts - use "receiver_id" (for recipient and called smart-contracts) and "signer_id" (for sender, who sign transaction) columns for `transactions` table. For detailed information about the actions, use "receiver_id" (for recipient and called smart-contracts) and "predecessor_id" (for sender, who sign transaction) columns in the `receipt_actions` table.
-- Final result should be as simple as possible, based on user request. 
+- Do **not** JOIN tables, each table contain all necessary information for user request: "blocks" table represent blockchain blocks, "transactions" table has sender/recipient info and general count of transactions, "receipt_actions" table contain more details about each transaction -
+  sender/recipient, method, action kind, NEAR transfer and other details, use `tx_hash` column to find relation to transactions.
+- Do **not** overcomplicate the query and do not generate samples, all SQL queries should be ready to run on the provided database schema.
+- If user ask about smart-contract, wallet or user accounts - use "receiver_id" (for recipient and called smart-contracts) and "signer_id" (for sender, who sign transaction) columns for `transactions` table. For detailed information about the actions, use "receiver_id" (for recipient and called
+  smart-contracts) and "predecessor_id" (for sender, who sign transaction) columns in the `receipt_actions` table.
 - Use comments in the "Database Schema" section to understand each table and column in the database schema.
+- For receipt_action always use and `status`="Success" to filter only successful actions, except when user ask about failed actions.
 
 #### NEAR Blockchain Overview
 
-NEAR Protocol is a layer-1 blockchain with core components:
+NEAR Protocol core components:
 
 - Blocks: Represented in the "blocks" table, each block has metadata like block number ("block_height"), timestamp ("block_timestamp"), block_hash, producer ("author_account_id") and count of approvals ("approvals").
-- Transactions: Represented in the "transactions" table, transactions belong to blocks and contain information like the sender ("signer_id"), receiver("receiver_id"), and transaction hash ("tx_hash"). Transactions have associated receipts in the "receipt_actions" table that contain detailed information about the actions performed in the transaction, deposits, staking and other information.
+- Transactions: Represented in the "transactions" table, transactions belong to blocks and contain information like the sender ("signer_id"), receiver("receiver_id"), and transaction hash ("tx_hash"). Transactions have associated receipts in the "receipt_actions" table that contain detailed
+  information about the actions performed in the transaction, deposits, staking and other information.
 - Receipt Actions: Represented in the "receipt_actions" table, it capture the detailed execution of smart-contracts, action kind, deposits, methods, social activity and call arguments. Each receipt is belongs to transaction by the "transaction_hash" field.
 
 #### Fungible Tokens (FT)
 
 Standard: NEP-141, NEP-148
 These methods are recorded in the "receipt_actions" table, within the "method_name" column.
-Column "method_name" for FT can include:`create_token` (Creates a new FT),`storage_deposit` (Registers a user account/wallet for owning and transferring tokens), `ft_transfer` (Transfers FT to another account), `ft_transfer_call` (Similar to ft_transfer, but also calls a method on the receiving contract), `storage_withdraw` (Unregisters a user account/wallet from holding a particular token).
+Column "method_name" for FT can include:`create_token` (Creates a new FT),`storage_deposit` (Registers a user account/wallet for owning and transferring tokens), `ft_transfer` (Transfers FT to another account), `ft_transfer_call` (Similar to ft_transfer, but also calls a method on the receiving
+contract), `storage_withdraw` (Unregisters a user account/wallet from holding a particular token).
 Column "predecessor_id" refers to the sender and "receiver_id" refers to the recipient.
 
 #### Non-Fungible Tokens (NFT)
@@ -84,7 +89,6 @@ CREATE TABLE blocks (
     PRIMARY KEY (block_height)
 );
 
-
 CREATE TABLE transactions (
     block_height BIGINT NOT NULL, -- Block height to which the transaction belongs (linked to blocks table)
     block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL, -- Timestamp of the transaction, matching the block's timestamp
@@ -115,6 +119,73 @@ CREATE TABLE receipt_actions (
     PRIMARY KEY (id), -- The primary key is the unique action ID
     FOREIGN KEY (block_height) REFERENCES blocks(block_height) ON DELETE CASCADE
 );
+```
+
+### SQL Examples
+
+```sql
+-- Count of blocks after a certain date:
+SELECT COUNT(*) FROM blocks WHERE block_timestamp > '2023-10-01';
+
+-- Retrieve info of the latest block:
+SELECT block_hash, author_account_id FROM blocks ORDER BY block_height DESC LIMIT 1;
+
+-- Find the number of transactions in a specific block:
+SELECT COUNT(*) FROM transactions WHERE block_height = 127000000;
+
+-- Count of unique signer_id calling receiver_id in the last month:
+SELECT COUNT(DISTINCT signer_id) FROM transactions WHERE block_timestamp >= NOW() - INTERVAL '1 month';
+
+-- List of last 1000 tx_hash for transactions where signer_id contains ".hot.tg":
+SELECT tx_hash FROM transactions WHERE signer_id LIKE '%.hot.tg' ORDER BY block_timestamp DESC LIMIT 1000;
+
+-- Retrieve the last 5 transactions with the highest NEAR transfer amount:
+SELECT * FROM receipt_actions ORDER BY deposit DESC LIMIT 5;
+
+-- Retrieve last comments on NEAR Social:
+SELECT * FROM receipt_actions WHERE receiver_id = 'social.near' AND social_kind = 'Comment' AND status = 'Success' ORDER BY block_timestamp DESC LIMIT 10;
+
+-- Unique tx_hash for transfers from "earn.kaiching" over 1 NEAR:
+SELECT DISTINCT tx_hash FROM receipt_actions WHERE predecessor_id = 'earn.kaiching' AND deposit > 1 AND action_kind = 'Transfer' AND status = 'Success';
+
+-- All FT transfers for 1 October 2024:
+SELECT * FROM receipt_actions WHERE method_name = 'ft_transfer' AND block_timestamp >= '2024-10-01' AND block_timestamp < '2024-10-02'  AND status = 'Success';
+
+-- Failed calls to "some.near":
+SELECT * FROM receipt_actions WHERE receiver_id = 'some.near' AND action_kind = 'FunctionCall' AND status = 'Failure';
+
+-- Find the number of unique accounts that staked in the last week:
+SELECT COUNT(DISTINCT predecessor_id) FROM receipt_actions WHERE action_kind = 'Stake' AND block_timestamp >= NOW() - INTERVAL '1 week';
+
+-- New wallet accounts created in the last 3 days:
+SELECT * FROM receipt_actions WHERE action_kind = 'CreateAccount' AND block_timestamp >= NOW() - INTERVAL '3 day' AND status = 'Success';
+
+-- Unique wallets that deployed contracts after block 1,000,000:
+SELECT DISTINCT predecessor_id FROM receipt_actions WHERE action_kind = 'DeployContract' AND block_height > 128000000;
+
+-- Top 500 wallets/smart-contracts by gas used in the last 1 month:
+SELECT predecessor_id, SUM(gas) AS total_gas FROM receipt_actions WHERE block_timestamp >= NOW() - INTERVAL '1 month' GROUP BY predecessor_id ORDER BY total_gas DESC LIMIT 500;
+
+-- Find the top 10 receivers with the highest total deposits:
+SELECT receiver_id, SUM(deposit) AS total_deposits FROM receipt_actions GROUP BY receiver_id ORDER BY total_deposits DESC LIMIT 10;
+
+-- First 100 NFT transfers:
+SELECT * FROM receipt_actions WHERE method_name = 'nft_transfer' AND status = 'Success' ORDER BY block_timestamp LIMIT 100;
+
+-- Get top 1000 actions by staking amount for accounts receiving NEAR staking in the last year:
+SELECT receiver_id, stake FROM receipt_actions WHERE action_kind = 'Stake' AND block_timestamp >= NOW() - INTERVAL '1 year' AND status = 'Success' ORDER BY stake DESC LIMIT 1000;
+
+-- Count of actions with social_kind equal to "Follow":
+SELECT COUNT(*) FROM receipt_actions WHERE social_kind = 'Follow';
+
+-- Average gas used for FunctionCall actions in the last week:
+SELECT AVG(gas) FROM receipt_actions WHERE action_kind = 'FunctionCall' AND block_timestamp >= NOW() - INTERVAL '1 week';
+
+-- Distinct predecessor_id for accounts involved in failed actions:
+SELECT DISTINCT predecessor_id FROM receipt_actions WHERE status = 'Failure';
+
+-- Get new wallets created last 48 hours, that use near social.
+SELECT * FROM receipt_actions WHERE predecessor_id IN (SELECT DISTINCT predecessor_id FROM receipt_actions WHERE action_kind = 'CreateAccount' AND block_timestamp >= NOW() - INTERVAL '48 hours') AND receiver_id = 'social.near';
 ```
 
 ### Answer

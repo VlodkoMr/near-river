@@ -10,13 +10,13 @@ router = APIRouter()
 ai_model_service = AIModelService()
 
 
-class SQLQuestionRequest(BaseModel):
+class SQLGenerateRequest(BaseModel):
     question: str = ""
 
 
-@router.post("/sql")
+@router.post("/sql-generate")
 @exception_handler
-async def get_analytics_question(request: SQLQuestionRequest):
+async def get_analytics_sql(request: SQLGenerateRequest):
     result_sql = ''
     question = request.question.strip()
 
@@ -27,10 +27,6 @@ async def get_analytics_question(request: SQLQuestionRequest):
         # Use the AI service to generate SQL query based on the question
         result_sql = ai_model_service.run_sql_command(question)
         print('Result SQL: ', result_sql)
-
-        # Try to execute generated SQL query and return the result
-        async with DatabaseService() as db:
-            query_data = await db.run_raw_sql(result_sql)
     except Exception as e:
         return {
             "question": question,
@@ -40,6 +36,36 @@ async def get_analytics_question(request: SQLQuestionRequest):
 
     return {
         "question": question,
+        "sql": result_sql,
+    }
+
+
+class SQLDataRequest(BaseModel):
+    sql: str = ""
+
+
+@router.post("/sql-data")
+@exception_handler
+async def get_analytics_sql_results(request: SQLDataRequest):
+    sql = request.sql.strip()
+
+    if not sql:
+        raise HTTPException(status_code=400, detail="SQL is required to process the request.")
+
+    try:
+        # Check and clean the SQL query
+        result_sql = ai_model_service.clean_generated_sql(sql)
+
+        # Try to execute generated SQL query and return the result
+        async with DatabaseService() as db:
+            query_data = await db.run_raw_sql(result_sql)
+    except Exception as e:
+        return {
+            "sql": sql,
+            "error": str(e)
+        }
+
+    return {
         "sql": result_sql,
         "data": query_data
     }
