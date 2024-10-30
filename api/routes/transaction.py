@@ -22,14 +22,15 @@ async def count_tx():
 @exception_handler
 async def get_transaction_daily_count():
     async with DatabaseService() as db:
-        return await db.run_raw_sql(
-            query="""
+        limit = conf.DEFAULT_PAGE_LIMIT
+        query = """
             SELECT DATE(block_timestamp) AS date, COUNT(*) AS transaction_count 
             FROM transactions 
             GROUP BY date 
-            ORDER BY date
-            """
-        )
+            ORDER BY date DESC
+            LIMIT $1
+        """
+        return await db.run_raw_sql(query, [limit])
 
 
 @router.get("/hash/{hash}")
