@@ -56,8 +56,9 @@ CREATE TABLE receipt_actions (
 CREATE INDEX idx_receipt_actions_block_timestamp ON receipt_actions(block_timestamp);
 CREATE INDEX idx_receipt_actions_predecessor_id ON receipt_actions(predecessor_id);
 CREATE INDEX idx_receipt_actions_receiver_id ON receipt_actions(receiver_id);
-CREATE INDEX idx_receipt_actions_method_name ON receipt_actions(method_name);
-CREATE INDEX idx_receipt_actions_predecessor_receiver ON receipt_actions(predecessor_id, receiver_id);
+CREATE INDEX idx_receipt_actions_method_name_status ON receipt_actions(method_name, status);
+CREATE INDEX idx_receipt_actions_deposit_status ON receipt_actions(deposit, status);
+CREATE INDEX idx_receipt_actions_predecessor_receiver_status ON receipt_actions(predecessor_id, receiver_id, status);
 
 
 CREATE TABLE event_progress (

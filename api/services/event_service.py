@@ -132,9 +132,6 @@ class EventService:
             near_account = self.get_near_account()
             result = await near_account.function_call(address, method, {"tx_data": tx_data})
             logger.info(f"Successfully called smart contract method with result: {result}")
-            print('==================================')
-            print(result)
-            print('==================================')
         except Exception as e:
             logger.error(f"Smart contract call failed: {e}")
 

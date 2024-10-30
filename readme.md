@@ -17,13 +17,6 @@ extendable API with integrated AI support.
 - **No External API Usage for AI:** Enjoy unlimited AI queries without rate or data limits, and no extra costs — the AI runs on your own machine!
 - **User-defined Event Subscriptions:** Define specific conditions or events to listen for and push these updates through a HTTP or smart-contract, providing real-time, filtered data streams.
 
-### Comparison with Existing NEAR Indexer/API Solutions:
-
-- **BigQuery:** Costly for reading large volumes of data, with no option to export extensive datasets.
-- **QueryAPI:** Currently unstable (still in beta), with limited control over the indexing process—no ability to stop or restart the indexer.
-- **Lake Framework:** Involves a complex setup, dependent on AWS, and requires an archival node for accessing historical data.
-- **Pikespeak API:** A solid solution, but it's not open-source or customizable for unique use cases, and it comes with a price tag.
-
 ## Requirements
 
 - Docker
@@ -138,15 +131,17 @@ Update AI and app settings in `api/config/settings.py` to customize the model be
 
 NEAR River is easy to set up, letting you run an indexer just in 7 minutes with real-time, stable data flow to your database.
 It’s scalable, flexible, and designed to handle any amount of data with real-time updates.
-The pre-built API makes querying easy, and data storage is optimized for reduced size.
+The pre-built API makes querying easy, and data storage is optimized for reduced size. You can extend the indexer and API with your custom logic.
 
-API with AI and Event Listeners:
+#### Comparison with Existing NEAR Indexer/API Solutions:
 
-- AI-Powered Data Querying: You can interact with the AI to ask about any data from the NEAR blockchain. The AI will generate the appropriate SQL query and return the most relevant results from your database.
-- Custom Event Listeners: Set up event listeners to trigger calls to NEAR or EVM-compatible chains based on your custom logic, enabling automated workflows.
+- **BigQuery:** Costly for reading large volumes of data, with no option to export extensive datasets.
+- **QueryAPI:** Currently unstable (still in beta), with limited control over the indexing process—no ability to stop or restart the indexer.
+- **Lake Framework:** Involves a complex setup, dependent on AWS, and requires an archival node for accessing historical data.
+- **Pikespeak API:** A solid solution, but it's not open-source or customizable for unique use cases, and it comes with a price tag.
 
 ## TODO
 
 - Add filter masks to extend filtering capabilities.
 - Update `receipt_actions`.`args` field to JSON for better data filtering and querying.
-- AI-driven Alerts and Analytics: Leverage the integrated AI to not only query data but also to provide predictive insights and alert users about unusual patterns, such as suspicious transaction volumes or unexpected contract behaviors.
+- Leverage the integrated AI to not only query data but also to provide predictive insights and alert users about unusual patterns, such as suspicious transaction volumes or unexpected contract behaviors.
