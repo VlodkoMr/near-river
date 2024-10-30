@@ -136,13 +136,13 @@ SELECT COUNT(*) FROM transactions WHERE block_height = 127000000;
 -- Count of unique signer_id calling receiver_id in the last month:
 SELECT COUNT(DISTINCT signer_id) FROM transactions WHERE block_timestamp >= NOW() - INTERVAL '1 month';
 
--- List of last 1000 tx_hash for transactions where signer_id contains ".hot.tg":
-SELECT tx_hash FROM transactions WHERE signer_id LIKE '%.hot.tg' ORDER BY block_timestamp DESC LIMIT 1000;
+-- List of last 1000 tx_hash for transactions where signer_id contains ".some.value":
+SELECT tx_hash FROM transactions WHERE signer_id LIKE '%.some.value' ORDER BY block_timestamp DESC LIMIT 1000;
 
 -- Retrieve the last 5 transactions with the highest NEAR transfer amount:
 SELECT * FROM receipt_actions ORDER BY deposit DESC LIMIT 5;
 
--- Retrieve last comments on NEAR Social:
+-- Retrieve last comments on 'social.near':
 SELECT * FROM receipt_actions WHERE receiver_id = 'social.near' AND social_kind = 'Comment' AND status = 'Success' ORDER BY block_timestamp DESC LIMIT 10;
 
 -- Unique tx_hash for transfers from "earn.kaiching" over 1 NEAR:
