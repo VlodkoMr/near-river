@@ -1,20 +1,22 @@
-import torch
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+
+from config.settings import conf
 from services.database_service import DatabaseService
 from helpers.decorators import exception_handler
 from services.ai_model_service import AIModelService
 
 router = APIRouter()
 
-ai_model_service = AIModelService()
+ai_sql_model_service = AIModelService(conf.AI_SQL_MODEL_ID)
+ai_summary_model_service = AIModelService(conf.AI_SUMMARY_MODEL_ID)
 
 
 class SQLGenerateRequest(BaseModel):
     question: str = ""
 
 
-@router.post("/sql-generate")
+@router.post("/sql")
 @exception_handler
 async def get_analytics_sql(request: SQLGenerateRequest):
     result_sql = ''
@@ -25,8 +27,12 @@ async def get_analytics_sql(request: SQLGenerateRequest):
 
     try:
         # Use the AI service to generate SQL query based on the question
-        result_sql = ai_model_service.run_sql_command(question)
+        result_sql = ai_sql_model_service.run_sql_command(question)
         print('Result SQL: ', result_sql)
+
+        # Try to execute generated SQL query and return the result
+        async with DatabaseService() as db:
+            query_data = await db.run_raw_sql(result_sql)
     except Exception as e:
         return {
             "question": question,
@@ -36,36 +42,6 @@ async def get_analytics_sql(request: SQLGenerateRequest):
 
     return {
         "question": question,
-        "sql": result_sql,
-    }
-
-
-class SQLDataRequest(BaseModel):
-    sql: str = ""
-
-
-@router.post("/sql-data")
-@exception_handler
-async def get_analytics_sql_results(request: SQLDataRequest):
-    sql = request.sql.strip()
-
-    if not sql:
-        raise HTTPException(status_code=400, detail="SQL is required to process the request.")
-
-    try:
-        # Check and clean the SQL query
-        result_sql = ai_model_service.clean_generated_sql(sql)
-
-        # Try to execute generated SQL query and return the result
-        async with DatabaseService() as db:
-            query_data = await db.run_raw_sql(result_sql)
-    except Exception as e:
-        return {
-            "sql": sql,
-            "error": str(e)
-        }
-
-    return {
         "sql": result_sql,
         "data": query_data
     }
@@ -88,10 +64,8 @@ async def get_analytics_question(request: SummaryQuestionRequest):
 
     try:
         # Use the AI service to generate SQL query based on the question
-        result_sql = ai_model_service.run_sql_command(sql_question)
+        result_sql = ai_sql_model_service.run_sql_command(sql_question)
         print('Result SQL: ', result_sql)
-
-        torch.cuda.empty_cache()
 
         # Try to execute generated SQL query and return the result
         async with DatabaseService() as db:
@@ -99,7 +73,7 @@ async def get_analytics_question(request: SummaryQuestionRequest):
             print('Query Data: ', query_data)
 
             # Use the AI service to generate summary based on the question and data
-            result_answer = ai_model_service.run_data_question_command(sql_question, data_question, query_data)
+            result_answer = ai_summary_model_service.run_data_question_command(sql_question, data_question, query_data)
 
     except Exception as e:
         return {

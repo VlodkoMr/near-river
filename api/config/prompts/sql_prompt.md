@@ -1,9 +1,6 @@
-### Task
+## Task
 
-Generate one SQL query to answer [QUESTION]{user_question}[/QUESTION].
-Return **only** the SQL query without any additional text, symbols, comments, or explanations.
-
-### Instructions
+Generate a SQL query to answer this question: `{user_question}`
 
 - Generate only read-only SQL queries, ignore any write operations and DDL commands, don't allow any data modification like UPDATE, DELETE, DROP etc, in this case return 'Not allowed'.
 - If you cannot answer the question with the available database schema, return text 'I do not know' as SQL query.
@@ -13,11 +10,11 @@ Return **only** the SQL query without any additional text, symbols, comments, or
   Kinds and Methods columns" for more details about user requests.
 - Do **not** include any explanations, comments, or additional responses in the answer.
 - Do **not** JOIN tables, each table contain all necessary information for user request: "blocks" table represent blockchain blocks, "transactions" table has sender/recipient of transactions, "receipt_actions" table contain more details about each transaction - if user ask
-  about transactions (include tokens, transfer amounts, gas, social or other action kinds) in most cases we should use "receipt_actions" table.
+  about transactions (include tokens, transfer amounts, gas, social or other action kinds) in most cases we should use "receipt_actions" table. You can use internal SELECT for complex queries.
 - Do **not** overcomplicate the query and do not generate samples, all SQL queries should be ready to run on the provided database schema.
 - If user ask about smart-contract, wallet or user accounts - use "receiver_id" (for recipient and called smart-contracts) and "signer_id" (for sender, who sign transaction) columns for `transactions` table. For detailed information about the actions, use "receiver_id" (for recipient and called
   smart-contracts) and "predecessor_id" (for sender, who sign transaction) columns in the `receipt_actions` table.
-- Use comments in the "Database Schema" section to understand each table and column in the database schema.
+- Use comments in the "DDL statements" section to understand each table and column in the database schema.
 - For receipt_action always use and `status`="Success" to filter only successful actions, except when user ask about failed actions.
 
 #### NEAR Blockchain Overview
@@ -74,12 +71,9 @@ Receipt actions "receipt_actions" table, "action_kind" column include various me
 
 Each action type can be identified using the "action_kind", and "method_name" column contain the specific method called within the action.
 
-### Database Schema
-
-The query will run on a database with the following schema:
+### DDL statements
 
 ```sql
-
 CREATE TABLE blocks (
     block_height BIGINT UNIQUE NOT NULL, -- Block height
     block_timestamp TIMESTAMP WITH TIME ZONE NOT NULL, -- The timestamp when the block was produced
@@ -191,10 +185,6 @@ SELECT * FROM receipt_actions WHERE deposit > 100 AND status = 'Success';
 SELECT * FROM receipt_actions WHERE predecessor_id IN (SELECT DISTINCT predecessor_id FROM receipt_actions WHERE action_kind = 'CreateAccount' AND block_timestamp >= NOW() - INTERVAL '48 hours') AND receiver_id = 'social.near';
 ```
 
-### Answer
+The following SQL query best answers the question `{user_question}`:
 
-Return the SQL query without any additional text, symbols, or comments:
-
-[QUESTION]{user_question}[/QUESTION]
-
-Return only the SQL query and **nothing else**. Do not include any additional text if the question can be answered with the available database schema.
+```sql

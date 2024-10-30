@@ -61,7 +61,7 @@ extendable API with integrated AI support.
 
 #### Download AI Models:
 
-You can use any AI model for this project. In our example, we use "Llama-3.2-3B-Instruct" from Hugging Face. To download it, follow these steps:
+You can use any AI model for this project. In our example, we use "llama-3-sqlcoder-8b" for SQL generation and "Llama-3.2-1B-Instruct" for data analyse from Hugging Face. To download it, follow these steps:
 
 - Install the Hugging Face CLI: https://huggingface.co/docs/huggingface_hub/guides/cli
 - Log in to your Hugging Face account:
@@ -73,7 +73,9 @@ huggingface-cli login
 - Download the model to /api/config/ai_models/ directory:
 
 ```bash
-huggingface-cli download meta-llama/Llama-3.2-3B-Instruct --local-dir api/config/ai_models/Llama-3.2-3B-Instruct
+cd api/
+huggingface-cli download defog/llama-3-sqlcoder-8b --local-dir config/ai_models/llama-3-sqlcoder-8b
+huggingface-cli download meta-llama/Llama-3.2-1B-Instruct --local-dir config/ai_models/Llama-3.2-1B-Instruct
 ```
 
 ## Running the Project
@@ -112,15 +114,12 @@ If you run docker with GPU support, you can use the AI-powered API to query the 
 To use the AI features, ensure that the API is running with GPU support and that the AI model has been downloaded as described earlier.
 The following AI endpoints are available:
 
-- POST `/api/analytics/sql-generate` - Submit a data-related question, and the AI will generate the most relevant SQL query for your request.
+- POST `/api/analytics/sql` - Submit a data-related question, and the AI will generate the most relevant SQL query and return both the query and the resulting data. We use the `llama-3-sqlcoder-8b` model for this task to generate SQL query and request data
+  from the database.
   > Request: {question: string}
-  > Success response: {question: string, sql: string}
+  > Success response: {question: string, sql: string, data: object[]}
   > Error response: {question: string, sql: string, error: string}
-- POST `/api/analytics/sql-data` - Submit a SQL query to get data from the database.
-  > Request: {sql: string}
-  > Success response: {sql: string, data: object[]}
-  > Error response: {sql: string, error: string}
-- POST `/api/analytics/question` - Ask a general question about the data. The AI will internally use the `/api/analytics/sql-generate` endpoint to retrieve, analyze the data and then process the answer using the `Llama-3.2-1B-Instruct` model.
+- POST `/api/analytics/question` - Ask a general question about the data. The AI will internally use the `/api/analytics/sql` endpoint to retrieve and analyze the data and then process the answer using the `Llama-3.2-1B-Instruct` model.
   > Request: {sql_question: string, data_question: string}. `sql_question` is used to generate SQL query, `data_question` is used to generate the answer based on the data.
   > Success response: {question: string, answer: string}
   > Error response: {question: string, error: string}
