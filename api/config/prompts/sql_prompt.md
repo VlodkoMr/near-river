@@ -12,8 +12,8 @@ Return **only** the SQL query without any additional text, symbols, comments, or
 - The question may contain NEAR blockchain-specific terms, "NEAR Blockchain Overview" section provides an overview of these terms and relations. Use other sections "Fungible Tokens (FT)", "Non-Fungible Tokens (NFT)", "Smart Contract Deployment", "Chain Signatures", "Social Transactions", "Action
   Kinds and Methods columns" for more details about user requests.
 - Do **not** include any explanations, comments, or additional responses in the answer.
-- Do **not** JOIN tables, each table contain all necessary information for user request: "blocks" table represent blockchain blocks, "transactions" table has sender/recipient info and general count of transactions, "receipt_actions" table contain more details about each transaction -
-  sender/recipient, method, action kind, NEAR transfer and other details, use `tx_hash` column to find relation to transactions.
+- Do **not** JOIN tables, each table contain all necessary information for user request: "blocks" table represent blockchain blocks, "transactions" table has sender/recipient of transactions, "receipt_actions" table contain more details about each transaction - if user ask
+  about transactions (include tokens, transfer amounts, gas, social or other action kinds) in most cases we should use "receipt_actions" table.
 - Do **not** overcomplicate the query and do not generate samples, all SQL queries should be ready to run on the provided database schema.
 - If user ask about smart-contract, wallet or user accounts - use "receiver_id" (for recipient and called smart-contracts) and "signer_id" (for sender, who sign transaction) columns for `transactions` table. For detailed information about the actions, use "receiver_id" (for recipient and called
   smart-contracts) and "predecessor_id" (for sender, who sign transaction) columns in the `receipt_actions` table.
@@ -183,6 +183,9 @@ SELECT AVG(gas) FROM receipt_actions WHERE action_kind = 'FunctionCall' AND bloc
 
 -- Distinct predecessor_id for accounts involved in failed actions:
 SELECT DISTINCT predecessor_id FROM receipt_actions WHERE status = 'Failure';
+
+-- Get transactions that sent more than 100 NEAR in last 3 month:
+SELECT * FROM receipt_actions WHERE deposit > 100 AND status = 'Success';
 
 -- Get new wallets created last 48 hours, that use near social.
 SELECT * FROM receipt_actions WHERE predecessor_id IN (SELECT DISTINCT predecessor_id FROM receipt_actions WHERE action_kind = 'CreateAccount' AND block_timestamp >= NOW() - INTERVAL '48 hours') AND receiver_id = 'social.near';
