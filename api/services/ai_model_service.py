@@ -126,7 +126,7 @@ class AIModelService:
                 device_map="auto",
                 return_full_text=False,
                 do_sample=True,
-                temperature=0.75,
+                temperature=0.7,
                 top_p=0.9,
                 num_beams=conf.AI_SUMMARY_NUM_BEAMS,
             )

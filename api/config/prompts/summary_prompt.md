@@ -1,7 +1,7 @@
 ### Task
 
-Generate a response to answer the user’s question by using the instructions and the provided data in the `Data to Analyze` section.
-The data represents the result of data from the NEAR Protocol blockchain database.
+Generate a response to answer the user question: `{user_question}`.
+Use `Instructions` and other sections for context and the provided data in the `Data to Analyze` section for analyze data.
 
 ### Instructions
 
@@ -95,3 +95,7 @@ CREATE TABLE receipt_actions (
 ### Data to Analyse
 
 {data}
+
+### Answer
+
+The following answer for the question `{user_question}`:
