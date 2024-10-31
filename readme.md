@@ -19,12 +19,12 @@ extendable API with integrated AI support.
 
 ## Requirements
 
-- Docker
-- CUDA toolkit + NVidia GPU (for AI model), only Linux and Windows are supported for now.
+- Docker-Compose: https://docs.docker.com/compose/install/
+- CUDA toolkit + NVidia GPU (for AI model): https://developer.nvidia.com/cuda-downloads
 
 ## Installation
 
-1. Get your `SUBSTREAMS_API_KEY` from https://app.streamingfast.io/keys.
+1. Get your `SUBSTREAMS_API_KEY` from https://app.streamingfast.io/keys
 
 2. Clone the repository:
 
@@ -70,7 +70,7 @@ You can use any AI model for this project. In our example, we use "llama-3-sqlco
 huggingface-cli login
 ```
 
-- Download the model to /api/config/ai_models/ directory:
+- Download the model to `/api/config/ai_models/` directory:
 
 ```bash
 cd api/
@@ -94,7 +94,7 @@ docker-compose up
 
 #### Reset the Database:
 
-To reset the database, remove the `substreams_init.lock` file and restart docker:
+To truncate the database, remove the `substreams_init.lock` file and restart docker:
 
 ```bash
 # stop docker
@@ -114,17 +114,18 @@ If you run docker with GPU support, you can use the AI-powered API to query the 
 To use the AI features, ensure that the API is running with GPU support and that the AI model has been downloaded as described earlier.
 The following AI endpoints are available:
 
-- POST `/api/analytics/sql` - Submit a data-related question, and the AI will generate the most relevant SQL query and return both the query and the resulting data. We use the `llama-3-sqlcoder-8b` model for this task to generate SQL query and request data
-  from the database.
+- POST `/api/analytics/sql` - Submit a data-related question, and the AI will generate the most relevant SQL query and return both the query and the resulting data. We use the `llama-3-sqlcoder-8b` model for this task to generate SQL query and request data from the database.
   > Request: {question: string}
   > Success response: {question: string, sql: string, data: object[]}
   > Error response: {question: string, sql: string, error: string}
+
 - POST `/api/analytics/question` - Ask a general question about the data. The AI will internally use the `/api/analytics/sql` endpoint to retrieve and analyze the data and then process the answer using the `Llama-3.2-1B-Instruct` model.
   > Request: {sql_question: string, data_question: string}. `sql_question` is used to generate SQL query, `data_question` is used to generate the answer based on the data.
   > Success response: {question: string, answer: string}
   > Error response: {question: string, error: string}
 
-Update AI and app settings in `api/config/settings.py` to customize the model behavior - increase the `AI_SQL_NUM_BEAMS` and `AI_SQL_MAX_TOKENS` to get better results at the cost of speed and memory.
+Update AI model and API settings in `api/config/settings.py` to customize the model behavior - increase the `AI_SQL_NUM_BEAMS` and `AI_SQL_MAX_TOKENS` to get better results at the cost of speed and memory. 
+You can edit prompts for the AI models in `api/config/prompts/` directory to customize the AI responses.
 
 ### Why Choose NEAR River?
 
@@ -141,6 +142,7 @@ The pre-built API makes querying easy, and data storage is optimized for reduced
 
 ## TODO
 
-- Add filter masks to extend filtering capabilities.
-- Update `receipt_actions`.`args` field to JSON for better data filtering and querying.
-- Leverage the integrated AI to not only query data but also to provide predictive insights and alert users about unusual patterns, such as suspicious transaction volumes or unexpected contract behaviors.
+- Add filter masks to enhance filtering options for Substreams and events.
+- Update the `receipt_actions`.`args` field to JSON format to improve data filtering and querying.
+- Deploy production infrastructure: a server for Substreams processing, a GPU server for the API, and master/slave database setup.
+- Utilize the integrated AI not only to analyze query data but also to provide predictive insights and alert users of unusual patterns.
