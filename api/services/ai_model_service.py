@@ -20,8 +20,11 @@ class AIModelService:
         """
         if not self.is_loaded:
             if torch.cuda.is_available():
-                self.model, self.tokenizer = self.setup_model(self.model_name)
-                self.is_loaded = True
+                try:
+                    self.model, self.tokenizer = self.setup_model(self.model_name)
+                    self.is_loaded = True
+                except Exception as e:
+                    raise RuntimeError("Error loading model: " + str(e))
             else:
                 raise Exception("GPU is not available. AI requires GPU to process the request.")
 
@@ -29,10 +32,13 @@ class AIModelService:
         """
         Offloads the model to free up GPU memory.
         """
-        if self.is_loaded:
+        try:
             del self.model
             del self.tokenizer
+            self.model = None
+            self.tokenizer = None
             torch.cuda.empty_cache()
+        finally:
             self.is_loaded = False
 
     def setup_model(self, model_name: str):
